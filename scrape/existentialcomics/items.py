@@ -6,6 +6,10 @@
 from scrapy.item import Item, Field
 
 class ExistentialcomicsItem(Item):
-    # define the fields for your item here like:
-    # name = Field()
+    title = Field()
+    url = Field()
+    subtext = Field()
+    image_urls = Field()
+    images = Field()
+
     pass

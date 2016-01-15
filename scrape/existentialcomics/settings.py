@@ -13,6 +13,7 @@ NEWSPIDER_MODULE = 'existentialcomics.spiders'
 
 # image downloading configuration
 ITEM_PIPELINES = {'scrapy.contrib.pipeline.images.ImagesPipeline': 1}
+
 IMAGES_STORE = './images'
 IMAGES_EXPIRES = 90
 
