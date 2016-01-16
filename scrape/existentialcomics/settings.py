@@ -13,14 +13,18 @@ NEWSPIDER_MODULE = 'existentialcomics.spiders'
 
 # image downloading configuration
 ITEM_PIPELINES = {
-	'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
-	'existentialcomics.pipelines.MergeImagesPipeline':  2
+    'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
+    'existentialcomics.pipelines.MergeImagesPipeline':  2,
+    'existentialcomics.pipelines.MongoPipeline':  100,
 }
 
 IMAGES_STORE = './images'
 IMAGES_EXPIRES = 90
 
-
+MONGODB_SERVER = "mongo"
+MONGODB_PORT = 27017
+MONGODB_DB = "comics"
+MONGODB_COLLECTION = "comics"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'existentialcomics (+http://www.yourdomain.com)'

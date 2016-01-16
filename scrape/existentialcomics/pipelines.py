@@ -5,6 +5,8 @@
 from scrapy.conf import settings
 from PIL import Image
 from os.path import isfile
+from scrapy.exceptions import DropItem
+import pymongo
 
 
 class ExistentialcomicsPipeline(object):
@@ -18,6 +20,7 @@ class MergeImagesPipeline(object):
             return self.process_item_merge(item)
         else:
             item['image'] = '%s/%s' % (settings['IMAGES_STORE'], item['images'][0]['path'])
+            return item
 
     def process_item_merge(self, item):
         image_path = '%s/%s_%s.png' % (settings['IMAGES_STORE'], item['comic'], item['title'])
@@ -41,5 +44,40 @@ class MergeImagesPipeline(object):
             image_path = '%s/%s_%s.png' % (settings['IMAGES_STORE'], item['comic'], item['title'])
             merge_image.save(image_path)
         item['image'] = image_path
+
+        return item
+
+
+class MongoPipeline(object):
+
+    def __init__(self):
+        connection = pymongo.MongoClient(
+            settings['MONGODB_SERVER'],
+            settings['MONGODB_PORT']
+        )
+        db = connection[settings['MONGODB_DB']]
+        self.collection = db[settings['MONGODB_COLLECTION']]
+
+    def process_item(self, item, spider):
+        print "START"
+        print item
+        title = item['title']
+        comic = item['comic']
+        image = item['image']
+        subtext = item['subtext']
+
+        mongodb_item = self.collection.find_one({
+            'comic': comic,
+            'title': title
+        })
+
+        if not mongodb_item:
+            print "inserted?!"
+            self.collection.insert({
+                'comic': comic,
+                'title': title,
+                'image': image,
+                'text': subtext
+            })
 
         return item
