@@ -60,3 +60,5 @@ target/
 
 .ropeproject/
 scrape/images/
+*.swp
+*.sublime-project

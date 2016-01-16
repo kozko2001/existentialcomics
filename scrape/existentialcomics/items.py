@@ -5,11 +5,14 @@
 
 from scrapy.item import Item, Field
 
+
 class ExistentialcomicsItem(Item):
+    comic = Field()
     title = Field()
     url = Field()
     subtext = Field()
     image_urls = Field()
     images = Field()
+    image = Field()
 
     pass

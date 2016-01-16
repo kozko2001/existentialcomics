@@ -1,6 +1,7 @@
 import scrapy
 from existentialcomics.items import ExistentialcomicsItem
 
+
 class ExistentialSpider(scrapy.Spider):
     name = "existential"
     allowed_domains = ["existentialcomics.com"]
@@ -9,8 +10,9 @@ class ExistentialSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-    	item = ExistentialcomicsItem()
+        item = ExistentialcomicsItem()
 
+        item['comic'] = 'existentialcomics'
         item['title'] = response.xpath("//h3/text()").extract()[0]
         item['image_urls'] = response.xpath("//img[@class='comicImg']/@src").extract()
         item['subtext'] = response.xpath("string(//div[@id='explainHidden'])").extract_first()
@@ -21,5 +23,5 @@ class ExistentialSpider(scrapy.Spider):
         next_page = response.xpath("//area[@alt='next']/@href").extract_first()
 
         if next_page:
-        	url = "http://existentialcomics.com%s" % next_page
-        	yield scrapy.Request(url, callback=self.parse)
+            url = "http://existentialcomics.com%s" % next_page
+            yield scrapy.Request(url, callback=self.parse)
