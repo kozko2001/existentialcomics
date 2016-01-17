@@ -7,6 +7,7 @@ RUN apt-get install -y python python-pip python-dev libxml2-dev libxslt-dev libf
 
 ADD . /srv/project
 WORKDIR /srv/project
-RUN pip install -r scrape/requirements.txt
+RUN pip install -r requirements.txt
 
+EXPOSE 5000
 CMD ["/bin/bash"]

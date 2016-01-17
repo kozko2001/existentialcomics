@@ -65,6 +65,7 @@ class MongoPipeline(object):
         comic = item['comic']
         image = item['image']
         subtext = item['subtext']
+        url = item['url']
 
         mongodb_item = self.collection.find_one({
             'comic': comic,
@@ -77,7 +78,8 @@ class MongoPipeline(object):
                 'comic': comic,
                 'title': title,
                 'image': image,
-                'text': subtext
+                'text': subtext,
+                'url': url
             })
 
         return item
