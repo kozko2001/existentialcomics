@@ -1,0 +1,2 @@
+# m h  dom mon dow   command
+0 */2 * * * cd /srv/project/scrape/ && /usr/local/bin/scrapy crawl existential 2> /tmp/scraping_log
