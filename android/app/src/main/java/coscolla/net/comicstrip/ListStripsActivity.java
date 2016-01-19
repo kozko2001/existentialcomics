@@ -24,7 +24,7 @@ public class ListStripsActivity extends AppCompatActivity {
     setContentView(R.layout.activity_list_strips);
 
     Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("http://192.168.99.100:32770/")
+        .baseUrl("http://46.101.199.221/")
         .addConverterFactory(GsonConverterFactory.create())
         .build();
 

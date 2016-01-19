@@ -11,7 +11,7 @@ COPY dockerfiles/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 WORKDIR /srv/project
 
-RUN pip install -r scrape/requirements.txt
+RUN pip install -r requirements.txt
 EXPOSE 5000
 
 CMD ["/usr/bin/supervisord"]
