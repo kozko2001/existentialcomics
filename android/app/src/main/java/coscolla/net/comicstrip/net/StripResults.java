@@ -6,12 +6,12 @@ public class StripResults {
 
   public List<StripData> result;
 
-  class StripData {
-    String _id;
-    String title;
-    String text;
-    String url;
-    String comic;
+  public class StripData {
+    public String _id;
+    public String title;
+    public String text;
+    public String url;
+    public String comic;
   }
 }
 
