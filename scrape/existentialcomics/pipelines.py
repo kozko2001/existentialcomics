@@ -7,7 +7,7 @@ from PIL import Image
 from os.path import isfile
 from scrapy.exceptions import DropItem
 import pymongo
-
+import gridfs
 
 class ExistentialcomicsPipeline(object):
     def process_item(self, item, spider):
@@ -55,12 +55,10 @@ class MongoPipeline(object):
             settings['MONGODB_SERVER'],
             settings['MONGODB_PORT']
         )
-        db = connection[settings['MONGODB_DB']]
-        self.collection = db[settings['MONGODB_COLLECTION']]
+        self.db = connection[settings['MONGODB_DB']]
+        self.collection = self.db[settings['MONGODB_COLLECTION']]
 
     def process_item(self, item, spider):
-        print "START"
-        print item
         title = item['title']
         comic = item['comic']
         image = item['image']
@@ -73,11 +71,16 @@ class MongoPipeline(object):
         })
 
         if not mongodb_item:
-            print "inserted?!"
+            fs = gridfs.GridFSBucket(self.db)
+            file_id = fs.upload_from_stream(
+                            image,
+                            open(image))
+
             self.collection.insert({
                 'comic': comic,
                 'title': title,
                 'image': image,
+                'file_id': file_id,
                 'text': subtext,
                 'url': url
             })
