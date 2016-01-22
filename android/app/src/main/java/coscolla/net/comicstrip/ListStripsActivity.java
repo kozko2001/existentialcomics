@@ -2,6 +2,7 @@ package coscolla.net.comicstrip;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,10 +11,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import coscolla.net.comicstrip.net.ComicStripRestService;
 import coscolla.net.comicstrip.net.ComicsResults;
+import coscolla.net.comicstrip.net.StripResultItem;
 import coscolla.net.comicstrip.net.StripResults;
 import coscolla.net.comicstrip.ui.adapter.StripAdapter;
 import retrofit2.Callback;
@@ -24,9 +31,12 @@ import retrofit2.Retrofit;
 public class ListStripsActivity extends AppCompatActivity {
 
   private static final String LOGTAG = "ListStripsActivity";
+  public static final String STRIPS = "strips";
+  public static final String COMICSTRIP_END_POINT = "http://46.101.199.221/";
 
   @Bind(R.id.list) RecyclerView list;
   private StripAdapter listAdapter;
+  private List<StripResultItem> listData;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +45,25 @@ public class ListStripsActivity extends AppCompatActivity {
 
     ButterKnife.bind(this);
 
+    configureList();
     if(savedInstanceState == null) {
-      configureList();
       requestStrips();
+    } else {
+      loadStripsFromSavedInstance(savedInstanceState);
+      updateList();
     }
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    if(listData != null) {
+      Parcelable[] parcelable = new Parcelable[listData.size()];
+      for (int i = 0; i < parcelable.length; i++) {
+        parcelable[i] = Parcels.wrap(listData.get(i));
+      }
+      outState.putParcelableArray("strips", parcelable);
+    }
+    super.onSaveInstanceState(outState);
   }
 
   private void configureList() {
@@ -49,15 +74,17 @@ public class ListStripsActivity extends AppCompatActivity {
 
   private void requestStrips() {
     Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("http://46.101.199.221/")
+        .baseUrl(COMICSTRIP_END_POINT)
         .addConverterFactory(GsonConverterFactory.create())
         .build();
 
     ComicStripRestService service = retrofit.create(ComicStripRestService.class);
     service.listStrips("existentialcomics").enqueue(new Callback<StripResults>() {
+
       @Override
       public void onResponse(Response<StripResults> response) {
-        listAdapter.setData(response.body().result);
+        listData = response.body().result;
+        updateList();
       }
 
       @Override
@@ -66,6 +93,22 @@ public class ListStripsActivity extends AppCompatActivity {
         // TODO SHOW ERROR!
       }
     });
+  }
+
+  private void updateList() {
+    listAdapter.setData(listData);
+  }
+
+  /**
+   *
+   * @param savedInstanceState
+   */
+  private void loadStripsFromSavedInstance(Bundle savedInstanceState) {
+    Parcelable[] data = savedInstanceState.getParcelableArray(STRIPS);
+    listData = new ArrayList<>();
+    for(int i =0; i < data.length; i++) {
+      listData.add((StripResultItem) Parcels.unwrap(data[i]));
+    }
   }
 
   @Override

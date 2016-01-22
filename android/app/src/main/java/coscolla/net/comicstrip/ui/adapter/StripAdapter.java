@@ -1,22 +1,26 @@
 package coscolla.net.comicstrip.ui.adapter;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.parceler.Parcels;
+
 import java.util.Collections;
 import java.util.List;
 
+import coscolla.net.comicstrip.DetailStripActivity;
 import coscolla.net.comicstrip.R;
-import coscolla.net.comicstrip.net.StripResults;
+import coscolla.net.comicstrip.net.StripResultItem;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
-  private List<StripResults.StripData> data;
+  private List<StripResultItem> data;
 
-  public void setData(List<StripResults.StripData> data) {
+  public void setData(List<StripResultItem> data) {
     Collections.reverse(data);
     this.data = data;
     this.notifyDataSetChanged();
@@ -31,7 +35,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
   @Override
   public void onBindViewHolder(StripViewHolder holder, int position) {
-    StripResults.StripData strip = data.get(position);
+    StripResultItem strip = data.get(position);
     holder.bind(strip);
   }
 
@@ -48,14 +52,27 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 class StripViewHolder extends RecyclerView.ViewHolder {
 
   private TextView title;
+  private StripResultItem data;
 
   public StripViewHolder (View itemView) {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
+    itemView.setOnClickListener(ppp);
   }
 
-  public void bind(StripResults.StripData strip) {
+  public void bind(StripResultItem strip) {
+    this.data = strip;
     title.setText(strip.title);
   }
+
+  private final View.OnClickListener ppp = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      Intent i = new Intent(v.getContext(), DetailStripActivity.class);
+      i.putExtra("strip", Parcels.wrap(data));
+
+      v.getContext().startActivity(i);
+    }
+  };
 }
