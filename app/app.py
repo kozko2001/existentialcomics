@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, send_file,  make_response
 import pymongo
 from bson import json_util, ObjectId
 import json
+import gridfs
 
 app = Flask(__name__)
 
@@ -9,7 +10,7 @@ app = Flask(__name__)
 connection = pymongo.MongoClient('mongo')
 db = connection['comics']
 comics = db['comics']
-
+fs = gridfs.GridFSBucket(db)
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -48,9 +49,12 @@ def get_image(document_id):
     })
 
     if doc:
-        path = '/srv/project/scrape/%s' % (doc['image'])
-        print path
-        return send_file(path, mimetype='image/png')
+        grid_out = fs.open_download_stream(doc['file_id'])
+        contents = grid_out.read()
+        response = make_response(contents)
+
+        response.headers['Content-Type'] = 'image/png'
+        return response
     else:
         abort(404)
 
