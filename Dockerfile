@@ -6,7 +6,7 @@ RUN apt-get install -y python python-pip python-dev libxml2-dev libxslt-dev \
                       libffi-dev libssl-dev libjpeg-dev supervisor
 
 ADD . /srv/project
-COPY dockerfiles/crontab /var/spool/cron/crontabs/root
+COPY dockerfiles/crontab /etc/cron.d/crontab
 COPY dockerfiles/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 WORKDIR /srv/project
