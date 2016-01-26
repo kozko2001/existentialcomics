@@ -9,6 +9,7 @@ from scrapy.exceptions import DropItem
 import pymongo
 import gridfs
 
+
 class ExistentialcomicsPipeline(object):
     def process_item(self, item, spider):
         return item
@@ -64,6 +65,7 @@ class MongoPipeline(object):
         image = item['image']
         subtext = item['subtext']
         url = item['url']
+        order = item['order']
 
         mongodb_item = self.collection.find_one({
             'comic': comic,
@@ -72,9 +74,7 @@ class MongoPipeline(object):
 
         if not mongodb_item:
             fs = gridfs.GridFSBucket(self.db)
-            file_id = fs.upload_from_stream(
-                            image,
-                            open(image))
+            file_id = fs.upload_from_stream(image, open(image))
 
             self.collection.insert({
                 'comic': comic,
@@ -82,7 +82,8 @@ class MongoPipeline(object):
                 'image': image,
                 'file_id': file_id,
                 'text': subtext,
-                'url': url
+                'url': url,
+                'order': order
             })
 
         return item

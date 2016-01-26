@@ -12,6 +12,7 @@ db = connection['comics']
 comics = db['comics']
 fs = gridfs.GridFSBucket(db)
 
+
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -29,7 +30,7 @@ def listComics():
 
 @app.route("/comics/<comic>")
 def get_comic(comic):
-    projection = ['comic', 'title', 'text', 'url']
+    projection = ['comic', 'title', 'text', 'url', 'order']
     result = comics.find({
         'comic': comic
     }, projection)

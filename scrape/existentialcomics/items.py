@@ -14,5 +14,6 @@ class ExistentialcomicsItem(Item):
     image_urls = Field()
     images = Field()
     image = Field()
+    order = Field()
 
     pass
