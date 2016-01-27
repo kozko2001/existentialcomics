@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Existential Comics</string>
     <string name="open_browser">Open in Browser</string>
+    <string name="gcm_defaultSenderId">877459897703</string>
 </resources>

@@ -45,6 +45,8 @@ public class ListStripsActivity extends AppCompatActivity {
 
     ButterKnife.bind(this);
 
+    Log.d(LOGTAG, "MMM");
+
     configureList();
     if(savedInstanceState == null) {
       requestStrips();
