@@ -15,7 +15,8 @@ NEWSPIDER_MODULE = 'existentialcomics.spiders'
 ITEM_PIPELINES = {
     'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
     'existentialcomics.pipelines.MergeImagesPipeline':  2,
-    'existentialcomics.pipelines.MongoPipeline':  100,
+    'existentialcomics.pipelines.MongoPipeline':  10,
+    'existentialcomics.pipelines.PushPipeline':  20,
 }
 
 IMAGES_STORE = './images'

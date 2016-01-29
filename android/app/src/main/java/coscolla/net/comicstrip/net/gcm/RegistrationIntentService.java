@@ -12,6 +12,15 @@ import com.google.android.gms.iid.InstanceID;
 import java.io.IOException;
 
 import coscolla.net.comicstrip.R;
+import coscolla.net.comicstrip.net.ComicStripRestService;
+import coscolla.net.comicstrip.net.PushRegisterRequestData;
+import coscolla.net.comicstrip.net.PushRegisterResponse;
+import coscolla.net.comicstrip.net.PushRestService;
+import coscolla.net.comicstrip.net.SubcribeResult;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class RegistrationIntentService extends IntentService {
 
@@ -51,8 +60,44 @@ public class RegistrationIntentService extends IntentService {
   private void sendRegistrationToServer(String token) {
     // TODO: Make request to server
 
-    // TODO: When request is successful
-    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+    Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("http://192.168.11.9/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build();
+
+    final PushRestService service = retrofit.create(PushRestService.class);
+    PushRegisterRequestData data = new PushRegisterRequestData(token);
+    service.register(data).enqueue(new Callback<PushRegisterResponse>() {
+      @Override
+      public void onResponse(Response<PushRegisterResponse> response) {
+
+        Log.d(LOGTAG, "OK!!!");
+        String userId = response.body().id;
+        subscribeTo(userId, "existentialcomics", service);
+        // TODO: When request is successful
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(RegistrationIntentService.this);
+        sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+      }
+
+      @Override
+      public void onFailure(Throwable t) {
+        Log.d(LOGTAG, "FAIL !!!"  + t);
+      }
+    });
+
+  }
+
+  private void subscribeTo(String userId, String topic, PushRestService service) {
+      service.subscribe(userId, topic).enqueue(new Callback<SubcribeResult>() {
+        @Override
+        public void onResponse(Response<SubcribeResult> response) {
+          Log.d(LOGTAG, "OK!!!");
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+          Log.d(LOGTAG, "FAILED!!! !!!");
+        }
+      });
   }
 }

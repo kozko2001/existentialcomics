@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, send_file,  make_response
+from flask import Flask, jsonify, send_file, make_response, request
 import pymongo
 from bson import json_util, ObjectId
 import json
 import gridfs
+import requests
 
 app = Flask(__name__)
 
@@ -59,6 +60,40 @@ def get_image(document_id):
     else:
         abort(404)
 
+
+@app.route('/register', methods=['POST'])
+def register():
+    content = request.get_json()
+
+    data = {
+        'proto': content['proto'],
+        'token': content['token']
+    }
+
+    print data
+
+    r = requests.post("http://push:8081/subscribers", data=data)
+    json = r.json()
+
+    return jsonify({"id": json['id']})
+
+
+@app.route("/ping/<user_id>")
+def ping(user_id):
+    data = {
+        "badge": 0
+    }
+    r = requests.post("http://push:8081/subscriber/" + user_id, data=data)
+
+    return jsonify({"result": "ok"})
+
+
+@app.route("/subscribe/<user_id>/<topic>")
+def subscribe(user_id, topic):
+    r = requests.post("http://push:8081/subscriber/%s/subscriptions/%s" % (user_id, topic))
+    print r
+
+    return jsonify({"result": "ok"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

@@ -6,4 +6,7 @@
           android:title="@string/open_browser"
           compat:showAsAction="never"  />
 
+    <item android:id="@+id/menu_debug_register"
+          android:title="REGISTER PUSH NOTIFICATION"
+          compat:showAsAction="never"  />
 </menu>

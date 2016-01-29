@@ -5,9 +5,9 @@
 from scrapy.conf import settings
 from PIL import Image
 from os.path import isfile
-from scrapy.exceptions import DropItem
 import pymongo
 import gridfs
+import requests
 
 
 class ExistentialcomicsPipeline(object):
@@ -87,3 +87,16 @@ class MongoPipeline(object):
             })
 
         return item
+
+
+class PushPipeline(object):
+
+    def process_item(self, item, spider):
+        key = item['comic']
+        msg = "There is a new strip " + key
+        data = {
+            "msg": msg,
+            "data.comic": key,
+        }
+        r = requests.post("http://push:8081/event/%s" % key, data=data)
+        print r.status_code

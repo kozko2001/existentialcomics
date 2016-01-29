@@ -22,6 +22,7 @@ import coscolla.net.comicstrip.net.ComicStripRestService;
 import coscolla.net.comicstrip.net.ComicsResults;
 import coscolla.net.comicstrip.net.StripResultItem;
 import coscolla.net.comicstrip.net.StripResults;
+import coscolla.net.comicstrip.net.gcm.RegistrationIntentService;
 import coscolla.net.comicstrip.ui.adapter.StripAdapter;
 import retrofit2.Callback;
 import retrofit2.GsonConverterFactory;
@@ -127,6 +128,9 @@ public class ListStripsActivity extends AppCompatActivity {
       i.setData(Uri.parse(url));
       startActivity(i);
       return true;
+    } else if( item.getItemId() == R.id.menu_debug_register) {
+      Intent intent = new Intent(this, RegistrationIntentService.class);
+      startService(intent);
     }
     return super.onOptionsItemSelected(item);
   }
