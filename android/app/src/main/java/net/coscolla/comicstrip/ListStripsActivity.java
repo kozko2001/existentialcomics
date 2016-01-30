@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip;
+package net.coscolla.comicstrip;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -18,12 +18,11 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import coscolla.net.comicstrip.net.ComicStripRestService;
-import coscolla.net.comicstrip.net.ComicsResults;
-import coscolla.net.comicstrip.net.StripResultItem;
-import coscolla.net.comicstrip.net.StripResults;
-import coscolla.net.comicstrip.net.gcm.RegistrationIntentService;
-import coscolla.net.comicstrip.ui.adapter.StripAdapter;
+import net.coscolla.comicstrip.net.ComicStripRestService;
+import net.coscolla.comicstrip.net.StripResultItem;
+import net.coscolla.comicstrip.net.StripResults;
+import net.coscolla.comicstrip.net.gcm.RegistrationIntentService;
+import net.coscolla.comicstrip.ui.adapter.StripAdapter;
 import retrofit2.Callback;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Response;

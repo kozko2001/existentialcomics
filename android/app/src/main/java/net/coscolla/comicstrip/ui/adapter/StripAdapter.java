@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip.ui.adapter;
+package net.coscolla.comicstrip.ui.adapter;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -12,9 +12,9 @@ import org.parceler.Parcels;
 import java.util.Collections;
 import java.util.List;
 
-import coscolla.net.comicstrip.DetailStripActivity;
-import coscolla.net.comicstrip.R;
-import coscolla.net.comicstrip.net.StripResultItem;
+import net.coscolla.comicstrip.DetailStripActivity;
+import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.net.StripResultItem;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 

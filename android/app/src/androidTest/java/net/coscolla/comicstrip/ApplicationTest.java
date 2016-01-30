@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip;
+package net.coscolla.comicstrip;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

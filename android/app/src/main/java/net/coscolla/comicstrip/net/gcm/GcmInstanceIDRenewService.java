@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip.net.gcm;
+package net.coscolla.comicstrip.net.gcm;
 
 import android.content.Intent;
 

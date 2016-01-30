@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip;
+package net.coscolla.comicstrip;
 
 import org.junit.Test;
 

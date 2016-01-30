@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip.net.gcm;
+package net.coscolla.comicstrip.net.gcm;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
-import coscolla.net.comicstrip.R;
+import net.coscolla.comicstrip.R;
 
 public class GcmMessageHandler extends GcmListenerService {
   public static final int MESSAGE_NOTIFICATION_ID = 435345;

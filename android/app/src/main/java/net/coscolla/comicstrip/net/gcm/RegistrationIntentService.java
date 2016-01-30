@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip.net.gcm;
+package net.coscolla.comicstrip.net.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -11,12 +11,11 @@ import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
 
-import coscolla.net.comicstrip.R;
-import coscolla.net.comicstrip.net.ComicStripRestService;
-import coscolla.net.comicstrip.net.PushRegisterRequestData;
-import coscolla.net.comicstrip.net.PushRegisterResponse;
-import coscolla.net.comicstrip.net.PushRestService;
-import coscolla.net.comicstrip.net.SubcribeResult;
+import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.net.PushRegisterRequestData;
+import net.coscolla.comicstrip.net.PushRegisterResponse;
+import net.coscolla.comicstrip.net.PushRestService;
+import net.coscolla.comicstrip.net.SubcribeResult;
 import retrofit2.Callback;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Response;

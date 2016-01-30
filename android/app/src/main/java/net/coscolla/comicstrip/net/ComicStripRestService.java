@@ -1,4 +1,4 @@
-package coscolla.net.comicstrip.net;
+package net.coscolla.comicstrip.net;
 
 
 import retrofit2.Call;
