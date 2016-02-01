@@ -14,7 +14,7 @@ import org.parceler.Parcels;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import net.coscolla.comicstrip.net.StripResultItem;
+import net.coscolla.comicstrip.net.comic.StripResultItem;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class DetailStripActivity extends AppCompatActivity {

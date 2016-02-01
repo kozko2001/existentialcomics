@@ -1,4 +1,4 @@
-package net.coscolla.comicstrip.net.gcm;
+package net.coscolla.comicstrip.net.push.gcm;
 
 import android.app.NotificationManager;
 import android.content.Context;

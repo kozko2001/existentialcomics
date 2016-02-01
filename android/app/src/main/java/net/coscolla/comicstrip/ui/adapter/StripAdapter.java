@@ -14,7 +14,7 @@ import java.util.List;
 
 import net.coscolla.comicstrip.DetailStripActivity;
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.net.StripResultItem;
+import net.coscolla.comicstrip.net.comic.StripResultItem;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 

@@ -3,6 +3,7 @@ package net.coscolla.comicstrip;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,36 +19,54 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import net.coscolla.comicstrip.net.ComicStripRestService;
-import net.coscolla.comicstrip.net.StripResultItem;
-import net.coscolla.comicstrip.net.StripResults;
-import net.coscolla.comicstrip.net.gcm.RegistrationIntentService;
+
+import net.coscolla.comicstrip.di.Graph;
+import net.coscolla.comicstrip.net.comic.ComicApi;
+import net.coscolla.comicstrip.net.comic.StripResultItem;
+import net.coscolla.comicstrip.net.comic.StripResults;
+import net.coscolla.comicstrip.net.push.PushManager;
 import net.coscolla.comicstrip.ui.adapter.StripAdapter;
+
+import javax.inject.Inject;
+
 import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class ListStripsActivity extends AppCompatActivity {
 
   private static final String LOGTAG = "ListStripsActivity";
   public static final String STRIPS = "strips";
-  public static final String COMICSTRIP_END_POINT = "http://46.101.199.221/";
 
   @Bind(R.id.list) RecyclerView list;
-  private StripAdapter listAdapter;
+
   private List<StripResultItem> listData;
+
+  @Inject ComicApi api;
+  @Inject PushManager pushManager;
+  @Inject StripAdapter listAdapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_list_strips);
 
+    Graph.getInstance().getListStripsComponent().inject(this);
+
     ButterKnife.bind(this);
-
-    Log.d(LOGTAG, "MMM");
-
     configureList();
+
+    loadFromSavedInstanceOrNetwork(savedInstanceState);
+  }
+
+  /**
+   * Fills the adapter with the data of:
+   *
+   * 1) savedInstance if there is available data
+   * 2) if not, we just do the request and fill the information when all the data is available
+   *
+   * @param savedInstanceState
+   */
+  private void loadFromSavedInstanceOrNetwork(Bundle savedInstanceState) {
     if(savedInstanceState == null) {
       requestStrips();
     } else {
@@ -59,29 +78,40 @@ public class ListStripsActivity extends AppCompatActivity {
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     if(listData != null) {
-      Parcelable[] parcelable = new Parcelable[listData.size()];
-      for (int i = 0; i < parcelable.length; i++) {
-        parcelable[i] = Parcels.wrap(listData.get(i));
-      }
+      Parcelable[] parcelable = dataToParcelable();
       outState.putParcelableArray("strips", parcelable);
     }
     super.onSaveInstanceState(outState);
   }
 
+  /***
+   * Converts the current data of the list to parcelable so we can store it on the saved instance
+   *
+   * @return a parcelable with the information
+   */
+  @NonNull
+  private Parcelable[] dataToParcelable() {
+    Parcelable[] parcelable = new Parcelable[listData.size()];
+    for (int i = 0; i < parcelable.length; i++) {
+      parcelable[i] = Parcels.wrap(listData.get(i));
+    }
+    return parcelable;
+  }
+
+  /**
+   * Configures properly the recycler view
+   */
   private void configureList() {
     listAdapter = new StripAdapter();
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
   }
 
+  /**
+   * Use the api to request the data to the comic service
+   */
   private void requestStrips() {
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(COMICSTRIP_END_POINT)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build();
-
-    ComicStripRestService service = retrofit.create(ComicStripRestService.class);
-    service.listStrips("existentialcomics").enqueue(new Callback<StripResults>() {
+    api.listStrips("existentialcomics").enqueue(new Callback<StripResults>() {
 
       @Override
       public void onResponse(Response<StripResults> response) {
@@ -92,11 +122,13 @@ public class ListStripsActivity extends AppCompatActivity {
       @Override
       public void onFailure(Throwable t) {
         Log.d(LOGTAG, "onFailure");
-        // TODO SHOW ERROR!
       }
     });
   }
 
+  /**
+   * Updates the list adapter with the new data available
+   */
   private void updateList() {
     listAdapter.setData(listData);
   }
@@ -128,8 +160,7 @@ public class ListStripsActivity extends AppCompatActivity {
       startActivity(i);
       return true;
     } else if( item.getItemId() == R.id.menu_debug_register) {
-      Intent intent = new Intent(this, RegistrationIntentService.class);
-      startService(intent);
+      pushManager.subscribe("existential");
     }
     return super.onOptionsItemSelected(item);
   }

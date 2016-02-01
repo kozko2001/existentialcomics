@@ -31,6 +31,7 @@ android {
 ext {
     supportLibraryVersion = '23.+'
     retrofitVersion = '2.0.0-beta3'
+    daggerVersion = '2.0.2'
 }
 
 dependencies {
@@ -51,4 +52,8 @@ dependencies {
 
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+
+    compile "com.google.dagger:dagger:$daggerVersion"
+    apt "com.google.dagger:dagger-compiler:$daggerVersion"
+    provided 'javax.annotation:jsr250-api:1.0'
 }
