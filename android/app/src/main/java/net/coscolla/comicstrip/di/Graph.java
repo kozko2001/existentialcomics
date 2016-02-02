@@ -42,6 +42,10 @@ public class Graph {
     return getAppComponent().plus(new ListStripsModule());
   }
 
+  public DetailStripsComponent getDetailStripComponent() {
+    return getAppComponent().plus(new DetailStripsModule());
+  }
+
   public void createAppComponent(Context appContext) {
     appComponent = DaggerAppComponent.builder()
         .appModule(new AppModule(appContext))

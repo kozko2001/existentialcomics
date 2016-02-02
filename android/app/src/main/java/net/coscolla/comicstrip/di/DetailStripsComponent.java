@@ -16,26 +16,15 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.comic.ComicApi;
+import net.coscolla.comicstrip.DetailStripActivity;
+import net.coscolla.comicstrip.ListStripsActivity;
 
-import javax.inject.Named;
+import dagger.Subcomponent;
 
-import dagger.Module;
-import dagger.Provides;
-import retrofit2.GsonConverterFactory;
-import retrofit2.Retrofit;
-
-@Module
-public class ComicApiModule {
-
-  @Provides
-  public ComicApi providesComicApi(@Named("endpoint") String endpoint) {
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(endpoint)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build();
-
-    return retrofit.create(ComicApi.class);
-  }
+@ActivityScope
+@Subcomponent(modules = {
+    DetailStripsModule.class
+})
+public interface DetailStripsComponent {
+  void inject(DetailStripActivity activity);
 }

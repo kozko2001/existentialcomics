@@ -55,6 +55,9 @@
             </intent-filter>
         </service>
         <!-- END GCM -->
+
+        <meta-data android:name="endpoint" android:value="http://192.168.11.9/" />
+
     </application>
 
 </manifest>

@@ -14,7 +14,13 @@ import org.parceler.Parcels;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.net.comic.StripResultItem;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class DetailStripActivity extends AppCompatActivity {
@@ -27,29 +33,36 @@ public class DetailStripActivity extends AppCompatActivity {
   private Bitmap stripBitmap;
   private PhotoViewAttacher photoViewAttacher;
 
+  @Inject @Named("endpoint") String apiEndpoint;
+
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.activity_detail_strip);
+    Graph.getInstance().getDetailStripComponent().inject(this);
 
     strip = Parcels.unwrap(getIntent().getParcelableExtra("strip"));
     ButterKnife.bind(this);
 
     this.setTitle(strip.title);
 
+    loadImageFromSavedInstanceOrNetwork(savedInstanceState);
+
+  }
+
+  private void loadImageFromSavedInstanceOrNetwork(@Nullable Bundle savedInstanceState) {
     loadImageFromSavedInstance(savedInstanceState);
     if(stripBitmap == null) {
       loadImageFromNetwork();
     }
-
   }
 
   private void loadImageFromSavedInstance(Bundle savedInstanceState) {
     if(savedInstanceState != null && savedInstanceState.containsKey(BITMAP)) {
       stripBitmap = savedInstanceState.getParcelable(BITMAP);
+      loadImageFromBitmap();
     }
-    loadImageFromBitmap();
   }
 
   private void loadImageFromBitmap() {
@@ -72,7 +85,7 @@ public class DetailStripActivity extends AppCompatActivity {
   }
 
   private void loadImageFromNetwork() {
-    final String imageUrl = "http://46.101.199.221/comics/image/" + strip._id;
+    final String imageUrl = apiEndpoint + "comics/image/" + strip._id;
 
     Glide.with(this)
         .load(imageUrl)

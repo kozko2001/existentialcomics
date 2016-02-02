@@ -17,6 +17,11 @@
 package net.coscolla.comicstrip.di;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
@@ -33,5 +38,20 @@ public class AppModule {
   @Provides
   public Context providesApplicationContext() {
     return appContext;
+  }
+
+  @Provides
+  @Named("endpoint")
+  public String providesEndpoint() {
+    ApplicationInfo ai = null;
+    try {
+      ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
+      Bundle bundle = ai.metaData;
+      return bundle.getString("endpoint");
+
+    } catch (PackageManager.NameNotFoundException e) {
+      return null;
+    }
+
   }
 }

@@ -21,6 +21,8 @@ import android.content.Context;
 import net.coscolla.comicstrip.net.push.PushManager;
 import net.coscolla.comicstrip.net.push.PushRestService;
 
+import javax.inject.Named;
+
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.GsonConverterFactory;
@@ -28,12 +30,11 @@ import retrofit2.Retrofit;
 
 @Module
 public class PushModule {
-  private static final String PUSH_END_POINT = "http://192.168.11.9/";
 
   @Provides
-  public PushRestService providesComicApi() {
+  public PushRestService providesComicApi(@Named("endpoint") String endpoint) {
     Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(PUSH_END_POINT)
+        .baseUrl(endpoint)
         .addConverterFactory(GsonConverterFactory.create())
         .build();
 
