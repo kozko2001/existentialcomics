@@ -26,11 +26,12 @@ import dagger.Component;
 
 @Singleton
 @Component(
-  modules = {
-    AppModule.class,
-    ComicApiModule.class,
-    PushModule.class
-  }
+    modules = {
+        AppModule.class,
+        ComicApiModule.class,
+        PushModule.class,
+        RepositoryModule.class
+    }
 )
 public interface AppComponent {
 

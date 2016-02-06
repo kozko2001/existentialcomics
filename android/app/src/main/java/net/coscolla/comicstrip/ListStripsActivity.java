@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -19,18 +20,18 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.ComicApi;
-import net.coscolla.comicstrip.net.comic.StripResultItem;
-import net.coscolla.comicstrip.net.comic.StripResults;
+import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
 import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.ui.adapter.AdapterCallback;
 import net.coscolla.comicstrip.ui.adapter.StripAdapter;
 
 import javax.inject.Inject;
 
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ListStripsActivity extends AppCompatActivity {
 
@@ -39,11 +40,11 @@ public class ListStripsActivity extends AppCompatActivity {
 
   @Bind(R.id.list) RecyclerView list;
 
-  private List<StripResultItem> listData;
+  private List<Strip> listData;
 
-  @Inject ComicApi api;
   @Inject PushManager pushManager;
   @Inject StripAdapter listAdapter;
+  @Inject ComicRepository repository;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,54 +56,14 @@ public class ListStripsActivity extends AppCompatActivity {
     ButterKnife.bind(this);
     configureList();
 
-    loadFromSavedInstanceOrNetwork(savedInstanceState);
-  }
-
-  /**
-   * Fills the adapter with the data of:
-   *
-   * 1) savedInstance if there is available data
-   * 2) if not, we just do the request and fill the information when all the data is available
-   *
-   * @param savedInstanceState
-   */
-  private void loadFromSavedInstanceOrNetwork(Bundle savedInstanceState) {
-    if(savedInstanceState == null) {
-      requestStrips();
-    } else {
-      loadStripsFromSavedInstance(savedInstanceState);
-      updateList();
-    }
-  }
-
-  @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    if(listData != null) {
-      Parcelable[] parcelable = dataToParcelable();
-      outState.putParcelableArray("strips", parcelable);
-    }
-    super.onSaveInstanceState(outState);
-  }
-
-  /***
-   * Converts the current data of the list to parcelable so we can store it on the saved instance
-   *
-   * @return a parcelable with the information
-   */
-  @NonNull
-  private Parcelable[] dataToParcelable() {
-    Parcelable[] parcelable = new Parcelable[listData.size()];
-    for (int i = 0; i < parcelable.length; i++) {
-      parcelable[i] = Parcels.wrap(listData.get(i));
-    }
-    return parcelable;
+    requestStrips();
   }
 
   /**
    * Configures properly the recycler view
    */
   private void configureList() {
-    listAdapter = new StripAdapter();
+    listAdapter.setCallback(this.adapterCallback);
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
   }
@@ -111,38 +72,35 @@ public class ListStripsActivity extends AppCompatActivity {
    * Use the api to request the data to the comic service
    */
   private void requestStrips() {
-    api.listStrips("existentialcomics").enqueue(new Callback<StripResults>() {
-
-      @Override
-      public void onResponse(Response<StripResults> response) {
-        listData = response.body().result;
-        updateList();
-      }
-
-      @Override
-      public void onFailure(Throwable t) {
-        Log.d(LOGTAG, "onFailure");
-      }
-    });
+    repository.getStrips("existentialcomics")
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(strips -> {
+          listData = strips;
+          updateList();
+        }, (error) -> {
+          Log.d(LOGTAG, "onFailure");
+        });
   }
+
+  private AdapterCallback<Strip> adapterCallback = ((eventName, model) -> {
+    if(eventName == StripAdapter.SELECTED) {
+      List<String> listIds = Observable.from(listData)
+          .map(s -> s._id)
+          .toList().toBlocking().first();
+
+      Intent intent = new Intent(ListStripsActivity.this, DetailStripActivity.class);
+      intent.putExtra(DetailStripActivity.STRIP, Parcels.wrap(model));
+      intent.putExtra(DetailStripActivity.IDS, listIds.toArray(new String[listIds.size()]));
+
+      startActivity(intent);
+    }
+  });
 
   /**
    * Updates the list adapter with the new data available
    */
   private void updateList() {
     listAdapter.setData(listData);
-  }
-
-  /**
-   *
-   * @param savedInstanceState
-   */
-  private void loadStripsFromSavedInstance(Bundle savedInstanceState) {
-    Parcelable[] data = savedInstanceState.getParcelableArray(STRIPS);
-    listData = new ArrayList<>();
-    for(int i =0; i < data.length; i++) {
-      listData.add((StripResultItem) Parcels.unwrap(data[i]));
-    }
   }
 
   @Override
@@ -164,4 +122,5 @@ public class ListStripsActivity extends AppCompatActivity {
     }
     return super.onOptionsItemSelected(item);
   }
+
 }

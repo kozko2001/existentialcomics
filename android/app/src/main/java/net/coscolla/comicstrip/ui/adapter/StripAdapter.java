@@ -14,13 +14,20 @@ import java.util.List;
 
 import net.coscolla.comicstrip.DetailStripActivity;
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.net.comic.StripResultItem;
+import net.coscolla.comicstrip.net.comic.api.entities.Strip;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
-  private List<StripResultItem> data;
+  public static final String SELECTED = "selected";
 
-  public void setData(List<StripResultItem> data) {
+  private List<Strip> data;
+  private AdapterCallback<Strip> callback;
+
+  public void setCallback(AdapterCallback<Strip> callback) {
+    this.callback = callback;
+  }
+
+  public void setData(List<Strip> data) {
     Collections.reverse(data);
     this.data = data;
     this.notifyDataSetChanged();
@@ -30,12 +37,12 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
   public StripViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext()).inflate(
         R.layout.list_item_strip, parent, false);
-    return new StripViewHolder(view);
+    return new StripViewHolder(view, callback);
   }
 
   @Override
   public void onBindViewHolder(StripViewHolder holder, int position) {
-    StripResultItem strip = data.get(position);
+    Strip strip = data.get(position);
     holder.bind(strip);
   }
 
@@ -52,16 +59,18 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 class StripViewHolder extends RecyclerView.ViewHolder {
 
   private TextView title;
-  private StripResultItem data;
+  private Strip data;
+  private AdapterCallback<Strip> callback;
 
-  public StripViewHolder (View itemView) {
+  public StripViewHolder (View itemView, AdapterCallback<Strip> callback) {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
+    this.callback = callback;
     itemView.setOnClickListener(ppp);
   }
 
-  public void bind(StripResultItem strip) {
+  public void bind(Strip strip) {
     this.data = strip;
     title.setText(strip.title);
   }
@@ -69,10 +78,10 @@ class StripViewHolder extends RecyclerView.ViewHolder {
   private final View.OnClickListener ppp = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      Intent i = new Intent(v.getContext(), DetailStripActivity.class);
-      i.putExtra("strip", Parcels.wrap(data));
-
-      v.getContext().startActivity(i);
+      if(callback != null) {
+        callback.onEvent(StripAdapter.SELECTED, data);
+      }
     }
   };
 }
+

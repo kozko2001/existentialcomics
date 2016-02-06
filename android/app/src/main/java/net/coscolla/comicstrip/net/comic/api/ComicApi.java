@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic;
+package net.coscolla.comicstrip.net.comic.api;
 
-import java.util.List;
 
-public class StripResults {
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import rx.Observable;
 
-  public List<StripResultItem> result;
+public interface ComicApi {
+  @GET("/comics")
+  Observable<ComicResults> listComics();
 
+  @GET("/comics/{comicname}")
+  Observable<StripResults> listStrips(@Path("comicname") String comicName);
 }
-

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic;
+package net.coscolla.comicstrip.net.comic.api.entities;
 
 import java.util.List;
 
-public class ComicsResults {
-
-  public List<String> comics;
+/**
+ * Entity refering to the comics available to see
+ */
+public class Comic {
+  public String name;
 
 }

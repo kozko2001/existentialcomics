@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic;
+package net.coscolla.comicstrip.net.comic.db.tables;
+
+public class ComicsTable {
+
+  public static final String TABLE = "comics";
+
+  public static final String COLUMN_NAME = "name";
 
 
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-
-public interface ComicApi {
-  @GET("/comics")
-  Call<ComicsResults> listComics();
-
-  @GET("/comics/{comicname}")
-  Call<StripResults> listStrips(@Path("comicname") String comicName);
+  public static String getCreateTableQuery() {
+    return "CREATE TABLE " + TABLE + " ( "
+        + COLUMN_NAME + " TEXT NOT NULL "
+        + ");";
+  }
 }

@@ -71,8 +71,10 @@ public class RegistrationIntentService extends IntentService {
     pushService.register(data).enqueue(new Callback<PushRegisterResponse>() {
       @Override
       public void onResponse(Response<PushRegisterResponse> response) {
-        String userId = response.body().id;
-        pushManager.setUserId(userId);
+        if(response.body() != null) {
+          String userId = response.body().id;
+          pushManager.setUserId(userId);
+        }
       }
 
       @Override

@@ -28,3 +28,6 @@
     **[] $VALUES;
     public *;
 }
+
+# retrolambda
+-dontwarn java.lang.invoke.*

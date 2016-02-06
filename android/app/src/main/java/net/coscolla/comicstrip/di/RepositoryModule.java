@@ -16,28 +16,26 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.comic.api.ComicApi;
+import android.content.Context;
 
-import javax.inject.Named;
+import net.coscolla.comicstrip.net.comic.api.ComicApi;
+import net.coscolla.comicstrip.net.comic.db.ComicCache;
+import net.coscolla.comicstrip.net.comic.repository.ComicRepositoryImpl;
+import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.GsonConverterFactory;
-import retrofit2.Retrofit;
-import retrofit2.RxJavaCallAdapterFactory;
 
 @Module
-public class ComicApiModule {
+public class RepositoryModule {
 
   @Provides
-  public ComicApi providesComicApi(@Named("endpoint") String endpoint) {
+  public ComicCache providesCache(Context appContext) {
+    return new ComicCache(appContext);
+  }
 
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(endpoint)
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-        .build();
-
-    return retrofit.create(ComicApi.class);
+  @Provides
+  public ComicRepository providesRepository(ComicApi api, ComicCache cache) {
+    return new ComicRepositoryImpl(api, cache);
   }
 }

@@ -23,8 +23,11 @@ class JSONEncoder(json.JSONEncoder):
 
 @app.route("/comics")
 def listComics():
+    all_comics = comics.distinct('comic')
+    all_comics = map(lambda c: {'name': c}, all_comics)
+
     result = {
-        'comics': comics.distinct('comic')
+        'comics': all_comics
     }
     return jsonify(result)
 

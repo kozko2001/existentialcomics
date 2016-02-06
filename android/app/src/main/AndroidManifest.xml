@@ -56,7 +56,7 @@
         </service>
         <!-- END GCM -->
 
-        <meta-data android:name="endpoint" android:value="http://192.168.11.9/" />
+        <meta-data android:name="endpoint" android:value="http://comic.allocsoc.net/" />
 
     </application>
 

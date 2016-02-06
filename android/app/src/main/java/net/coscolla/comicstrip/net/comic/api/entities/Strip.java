@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic;
+package net.coscolla.comicstrip.net.comic.api.entities;
 
 import org.parceler.Parcel;
 
 @Parcel
-public class StripResultItem {
+public class Strip {
     public String _id;
     public String title;
     public String text;
     public String url;
     public String comic;
+    public int order;
 }
