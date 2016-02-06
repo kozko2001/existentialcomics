@@ -1,20 +1,17 @@
-package net.coscolla.comicstrip.ui.adapter;
+package net.coscolla.comicstrip.ui.list.adapter;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.parceler.Parcels;
-
 import java.util.Collections;
 import java.util.List;
 
-import net.coscolla.comicstrip.DetailStripActivity;
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.ui.AdapterCallback;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
@@ -28,7 +25,6 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
   }
 
   public void setData(List<Strip> data) {
-    Collections.reverse(data);
     this.data = data;
     this.notifyDataSetChanged();
   }

@@ -16,8 +16,8 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.DetailStripActivity;
-import net.coscolla.comicstrip.ListStripsActivity;
+import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
+import net.coscolla.comicstrip.ui.detail.DetailStripPage;
 
 import dagger.Subcomponent;
 
@@ -27,4 +27,5 @@ import dagger.Subcomponent;
 })
 public interface DetailStripsComponent {
   void inject(DetailStripActivity activity);
+  void inject(DetailStripPage page);
 }

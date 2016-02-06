@@ -16,7 +16,7 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.ListStripsActivity;
+import net.coscolla.comicstrip.ui.list.ListStripsActivity;
 
 import dagger.Subcomponent;
 

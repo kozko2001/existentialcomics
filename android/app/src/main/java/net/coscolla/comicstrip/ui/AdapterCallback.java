@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.ui.adapter;
+package net.coscolla.comicstrip.ui;
 
 public interface AdapterCallback<T> {
 
