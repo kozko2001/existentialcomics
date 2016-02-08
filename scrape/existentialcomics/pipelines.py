@@ -18,10 +18,11 @@ class ExistentialcomicsPipeline(object):
 class MergeImagesPipeline(object):
     def process_item(self, item, spider):
         if len(item['images']) > 1:
-            return self.process_item_merge(item)
+            item = self.process_item_merge(item)
         else:
             item['image'] = '%s/%s' % (settings['IMAGES_STORE'], item['images'][0]['path'])
-            return item
+
+        return self.create_thumbnail(item)
 
     def process_item_merge(self, item):
         image_path = '%s/%s_%s.png' % (settings['IMAGES_STORE'], item['comic'], item['title'])
@@ -48,6 +49,27 @@ class MergeImagesPipeline(object):
 
         return item
 
+    def create_thumbnail(self, item):
+        image = Image.open(item['image'])
+        print "image original size %i %i " % (image.width, image.height)
+        min_axis = min(image.height, image.width)
+        print "min axis %i" % min_axis
+
+        thumbnail_size = 256.0
+        p = thumbnail_size / min_axis
+        print "mult: %f" % p
+
+        size = (image.width * p, image.height * p)
+        print size
+
+        image.thumbnail(size)
+
+        image_path = '%s/thumbnail_%s_%s.png' % (settings['IMAGES_STORE'], item['comic'], item['title'])
+        image.save(image_path, "JPEG", quality=90, optimize=True, progressive=True)
+        item["thumbnail"] = image_path
+
+        return item
+
 
 class MongoPipeline(object):
 
@@ -63,6 +85,7 @@ class MongoPipeline(object):
         title = item['title']
         comic = item['comic']
         image = item['image']
+        thumbnail = item['thumbnail']
         subtext = item['subtext']
         url = item['url']
         order = item['order']
@@ -75,6 +98,7 @@ class MongoPipeline(object):
         if not mongodb_item:
             fs = gridfs.GridFSBucket(self.db)
             file_id = fs.upload_from_stream(image, open(image))
+            thumbnail_file_id = fs.upload_from_stream(image, open(thumbnail))
 
             self.collection.insert({
                 'comic': comic,
@@ -83,7 +107,8 @@ class MongoPipeline(object):
                 'file_id': file_id,
                 'text': subtext,
                 'url': url,
-                'order': order
+                'order': order,
+                'thumbnail': thumbnail_file_id
             })
 
         return item

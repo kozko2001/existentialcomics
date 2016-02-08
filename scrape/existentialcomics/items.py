@@ -15,5 +15,4 @@ class ExistentialcomicsItem(Item):
     images = Field()
     image = Field()
     order = Field()
-
-    pass
+    thumbnail = Field()

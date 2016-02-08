@@ -13,7 +13,7 @@ NEWSPIDER_MODULE = 'existentialcomics.spiders'
 
 # image downloading configuration
 ITEM_PIPELINES = {
-    'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
+    'scrapy.pipelines.images.ImagesPipeline': 1,
     'existentialcomics.pipelines.MergeImagesPipeline':  2,
     'existentialcomics.pipelines.MongoPipeline':  10,
     'existentialcomics.pipelines.PushPipeline':  20,
