@@ -16,3 +16,13 @@ docker run --name pushd  -d --link redis:res -e "REDIS_HOST=res" -e "GCM_KEY=XXX
 docker run -p 80:5000 -v `pwd`:/srv/project --link mongodb:mongo --name comicstrip comicstrip
 ```
 
+
+
+For doing the first import just do the normal on the scrape folder :
+
+```scrapy crawl existential```
+
+but when doing for incremental, so the current date of when the data is crawled will be persisted
+if not able to extract that information from the page
+
+```scrapy crawl existential -a createdAt=1```

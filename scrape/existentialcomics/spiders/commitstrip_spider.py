@@ -4,30 +4,30 @@ from datetime import datetime
 from base import BaseSpider
 
 
-class DilbertSpider(BaseSpider):
-    name = "dilbert"
-    allowed_domains = ["dilbert.com"]
+class CommitStripSpider(BaseSpider):
+    name = "commitstrip"
+    allowed_domains = ["commitstrip.com"]
     start_urls = [
-        "http://dilbert.com"
+        "http://www.commitstrip.com/en/?"
     ]
 
     def parse(self, response):
-        url = response.xpath("//a[@itemprop='image']/@href")[0].extract()
+        url = response.xpath("//div[@class='excerpt']/section/a/@href").extract_first()
         yield scrapy.Request(url, callback=self.parse_strip)
 
     def parse_strip(self, response):
         if not self.existsInDatabase(response.url):
             item = ExistentialcomicsItem()
 
-            date = " ".join(response.xpath("//date/span/text()").extract())
-            date = datetime.strptime(date, "%A %B %d, %Y")
+            date = response.xpath("//article/header//time/@datetime").extract_first().split('+')[0]
+            date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S")
             if date.year < 2014:
                 return
             days_since_epoch = (date - datetime(1970, 1, 1)).days
 
-            item['comic'] = 'dilbert'
-            item['title'] = response.xpath("//date/span/text()").extract_first()
-            item['image_urls'] = response.xpath("//a[@itemprop='image']/img/@src").extract()
+            item['comic'] = 'commitstrip'
+            item['title'] = response.xpath("//article/header/h1/text()").extract_first()
+            item['image_urls'] = response.xpath("//div[@class='entry-content']//img/@src").extract()
             item['subtext'] = ""
             item['url'] = response.url
             item['createdAt'] = date
@@ -35,7 +35,6 @@ class DilbertSpider(BaseSpider):
             yield item
 
             ## going to next page
-            next_page = response.xpath("//div[contains(@class, 'nav-left')]/a/@href").extract_first()
-            if next_page:
-                url = "http://dilbert.com%s" % next_page
+            url = response.xpath("//span[@class='nav-previous']//a/@href").extract_first()
+            if url:
                 yield scrapy.Request(url, callback=self.parse_strip)

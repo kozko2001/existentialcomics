@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_file, make_response, request
+from flask import Flask, jsonify, send_file, make_response, request, abort
 import pymongo
 from bson import json_util, ObjectId
 import json
@@ -49,19 +49,28 @@ def get_comic(comic):
 
 @app.route('/comics/image/<document_id>')
 def get_image(document_id):
+    return _get_image(document_id, "file_id")
+
+
+@app.route('/comics/thumbnail/<document_id>')
+def get_thumbnail(document_id):
+    return _get_image(document_id, "thumbnail")
+
+
+def _get_image(document_id, image_field):
     doc = comics.find_one({
         '_id': ObjectId(document_id)
     })
 
     if doc:
-        grid_out = fs.open_download_stream(doc['file_id'])
+        grid_out = fs.open_download_stream(doc[image_field])
         contents = grid_out.read()
         response = make_response(contents)
 
         response.headers['Content-Type'] = 'image/png'
         return response
     else:
-        abort(404)
+        return abort(404)
 
 
 @app.route('/register', methods=['POST'])

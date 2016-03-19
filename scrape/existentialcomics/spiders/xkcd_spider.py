@@ -1,11 +1,10 @@
 import scrapy
 from existentialcomics.items import ExistentialcomicsItem
 import re
-import pymongo
-from scrapy.conf import settings
+from base import BaseSpider
 
 
-class XKCDSpider(scrapy.Spider):
+class XKCDSpider(BaseSpider):
     name = "xkcd"
     allowed_domains = ["xkcd.com"]
     start_urls = [
@@ -29,7 +28,7 @@ class XKCDSpider(scrapy.Spider):
             item['order'] = self.getOrderFromUrl(url)
             yield item
 
-            ## going to prev page
+            # going to prev page
             prev_page = response.xpath("//a[@rel='prev']/@href").extract_first()
             if prev_page:
                 url = "http://xkcd.com%s" % prev_page
@@ -44,16 +43,3 @@ class XKCDSpider(scrapy.Spider):
     def getOrderFromUrl(self, url):
         m = re.search('\/(\d+)', url)
         return m.group(1)
-
-    def existsInDatabase(self, url):
-        connection = pymongo.MongoClient(
-            settings['MONGODB_SERVER'],
-            settings['MONGODB_PORT']
-        )
-        db = connection[settings['MONGODB_DB']]
-        collection = db[settings['MONGODB_COLLECTION']]
-
-        db_comic = collection.find_one({
-            'url': url
-        })
-        return True if db_comic else False

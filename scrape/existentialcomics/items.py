@@ -16,3 +16,4 @@ class ExistentialcomicsItem(Item):
     image = Field()
     order = Field()
     thumbnail = Field()
+    createdAt = Field(serializer=str)
