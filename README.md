@@ -13,7 +13,7 @@ docker build -t comicstrip --rm .
 docker run --name mongodb -d mongo
 docker run --name redis -d redis
 docker run --name pushd  -d --link redis:res -e "REDIS_HOST=res" -e "GCM_KEY=XXX" -p 8080:8081  amsdard/pushd:latest
-docker run -p 80:5000 -v `pwd`:/srv/project --link mongodb:mongo --name comicstrip comicstrip
+docker run -e VIRTUAL_HOST=comic.allocsoc.net --link mongodb:mongo --link pushd:push --name comicstrip -d comicstrip
 ```
 
 

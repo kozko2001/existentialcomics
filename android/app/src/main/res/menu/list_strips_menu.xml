@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:compat="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/menu_push_notification"
+          android:title="@string/subscribe"
+          compat:showAsAction="always"
+          android:icon="@android:drawable/btn_star_big_on"
+        />
+    <!--
     <item android:id="@+id/menu_open_browser"
           android:title="@string/open_browser"
           compat:showAsAction="never"  />
@@ -9,4 +15,5 @@
     <item android:id="@+id/menu_debug_register"
           android:title="REGISTER PUSH NOTIFICATION"
           compat:showAsAction="never"  />
+          -->
 </menu>

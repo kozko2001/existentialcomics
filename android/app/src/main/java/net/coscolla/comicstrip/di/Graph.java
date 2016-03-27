@@ -18,6 +18,8 @@ package net.coscolla.comicstrip.di;
 
 import android.content.Context;
 
+import net.coscolla.comicstrip.ui.comics.ComicsActivity;
+
 /**
  * Class to store all the different graphs of dependency injection
  */
@@ -44,6 +46,10 @@ public class Graph {
 
   public DetailStripsComponent getDetailStripComponent() {
     return getAppComponent().plus(new DetailStripsModule());
+  }
+
+  public ComicsActivityComponent getComicsComponent(ComicsActivity activity) {
+    return getAppComponent().plus(new ComicsModule(activity));
   }
 
   public void createAppComponent(Context appContext) {

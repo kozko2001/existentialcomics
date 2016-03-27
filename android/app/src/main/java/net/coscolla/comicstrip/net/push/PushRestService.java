@@ -21,6 +21,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import rx.Observable;
 
 public interface PushRestService {
 
@@ -28,11 +29,11 @@ public interface PushRestService {
   Call<PushRegisterResponse> register(@Body PushRegisterRequestData request);
 
   @GET("/subscribe/{user_id}/{topic}")
-  Call<SubcribeResult> subscribe(@Path("user_id") String userId,
-                                @Path("topic") String topic);
+  Observable<SubscribeResult> subscribe(@Path("user_id") String userId,
+                                        @Path("topic") String topic);
 
   @GET("/ping/{user_id}")
-  Call<SubcribeResult> ping(@Path("user_id") String userId);
+  Call<SubscribeResult> ping(@Path("user_id") String userId);
 
 
 }

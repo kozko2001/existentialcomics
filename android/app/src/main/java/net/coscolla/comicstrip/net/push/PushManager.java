@@ -26,28 +26,34 @@ import android.util.Log;
 import net.coscolla.comicstrip.net.push.gcm.RegistrationIntentService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
+import timber.log.Timber;
 
 public class PushManager {
 
   private static final String LOGTAG = "PushManager";
   private final Context context;
   private static final String PUSH_USER_ID = "PUSH_USER_ID";
+  private static final String TOPICS_SUBSCRIBED = "TOPICS_SUBSCRIBED";
 
   /**
    * Array of topics that are not yet subscribed
    */
   private final ArrayList<String> pendingTopics;
+  private final PushRestService pushApi;
 
-  @Inject PushRestService pushApi;
-
-  public PushManager(Context appContext) {
+  public PushManager(Context appContext, PushRestService restService) {
     context = appContext;
     pendingTopics = new ArrayList<String>();
+    this.pushApi = restService;
   }
 
   /**
@@ -72,37 +78,44 @@ public class PushManager {
    * TODO: Handle when no connectivity with the push service and not really subscribed
    * @param topic
    */
-  public void subscribe(@NonNull final String topic) {
-    if(getUserId() == null) {
-      pendingTopics.add(topic);
-    } else {
-      pushApi.subscribe(getUserId(), topic).enqueue(new Callback<SubcribeResult>() {
-        @Override
-        public void onResponse(Response<SubcribeResult> response) {
-          Log.d(LOGTAG, "subscribed successfully to topic " + topic);
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-          Log.d(LOGTAG, "failed on subscribing to topic " + topic);
-        }
-      });
+  public Observable<SubscribeResult> subscribe(@NonNull final String topic) {
+      return pushApi.subscribe(getUserId(), topic)
+          .doOnNext(result -> setSubscribedTo(topic));
     }
+
+  /**
+   * When we have been subscribed to some topic store it in the local
+   *
+   * @param topic on to be subscribed
+   */
+  private void setSubscribedTo(String topic) {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    Set<String> subscribed = new HashSet<>(sharedPreferences.getStringSet(TOPICS_SUBSCRIBED, new HashSet<>()));
+
+    subscribed.add(topic);
+
+    sharedPreferences.edit().putStringSet(TOPICS_SUBSCRIBED, subscribed).commit();
+  }
+
+  public boolean isSubscribed(String topic) {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    Set<String> subscribed = sharedPreferences.getStringSet(TOPICS_SUBSCRIBED, new HashSet<>());
+    return subscribed.contains(topic);
   }
 
   /**
    * Pings the push server to maintain alive the notifications
    */
   private void ping() {
-    pushApi.ping(getUserId()).enqueue(new Callback<SubcribeResult>() {
+    pushApi.ping(getUserId()).enqueue(new Callback<SubscribeResult>() {
       @Override
-      public void onResponse(Response<SubcribeResult> response) {
-        Log.d(LOGTAG, "on ping request success");
+      public void onResponse(Call<SubscribeResult> call, Response<SubscribeResult> response) {
+        Timber.d("on ping request success");
       }
 
       @Override
-      public void onFailure(Throwable t) {
-        Log.d(LOGTAG, "on ping request failed", t);
+      public void onFailure(Call<SubscribeResult> call, Throwable t) {
+        Timber.e(t, "on ping request failed");
       }
     });
   }
@@ -129,7 +142,7 @@ public class PushManager {
    */
   public void setUserId(String userId) {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    sharedPreferences.edit().putString(PUSH_USER_ID, userId);
+    sharedPreferences.edit().putString(PUSH_USER_ID, userId).apply();
   }
 
 }

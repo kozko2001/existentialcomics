@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.fernandocejas.frodo'
+apply plugin: 'com.tmiyamon.mdicons'
+
 
 
 android {
@@ -39,10 +41,11 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '23.+'
-    retrofitVersion = '2.0.0-beta3'
+    supportLibraryVersion = '23.2.1'
+    retrofitVersion = '2.0.0'
     daggerVersion = '2.0.2'
     storioVersion = '1.8.0'
+    okhttpVersion = '3.2.0'
 }
 
 dependencies {
@@ -66,6 +69,8 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
+    compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+
 
 
     compile "com.google.dagger:dagger:$daggerVersion"
@@ -77,4 +82,18 @@ dependencies {
     compile "com.pushtorefresh.storio:sqlite:$storioVersion"
     compile "com.pushtorefresh.storio:sqlite-annotations:$storioVersion"
     apt "com.pushtorefresh.storio:sqlite-annotations-processor:$storioVersion"
+}
+
+mdicons {
+    defcolor 'mycolor', '#9804d9'
+
+    assets {
+        icons {
+            colors "mycolor", "white"
+            sizes  "36dp"
+            names  "favorite", "favorite_border"
+        }
+
+    }
+
 }

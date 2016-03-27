@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.ui.comics;
 
-import net.coscolla.comicstrip.net.comic.api.entities.Comic;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import org.parceler.Parcel;
 
-import java.util.List;
+@Parcel
+public class ComicAdapterModel {
+  public String comicName;
+  public boolean hasNotificationActivated;
 
-import rx.Observable;
+  public ComicAdapterModel() {
 
-public interface ComicRepository {
+  }
 
-  Observable<List<Comic>> getComics();
-
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
+  public ComicAdapterModel(String name, boolean hasNotification) {
+    this.comicName = name;
+    this.hasNotificationActivated = hasNotification;
+  }
 }

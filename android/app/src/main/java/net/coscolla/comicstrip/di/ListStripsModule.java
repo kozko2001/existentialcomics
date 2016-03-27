@@ -16,6 +16,7 @@
 
 package net.coscolla.comicstrip.di;
 
+import net.coscolla.comicstrip.net.comic.UrlBuilder;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
 
 import dagger.Module;
@@ -24,7 +25,7 @@ import dagger.Provides;
 @Module
 public class ListStripsModule {
   @Provides
-  public StripAdapter providesAdapter() {
-    return new StripAdapter();
+  public StripAdapter providesAdapter(UrlBuilder urlBuilder) {
+    return new StripAdapter(urlBuilder);
   }
 }

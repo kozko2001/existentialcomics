@@ -14,8 +14,23 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.push;
+package net.coscolla.comicstrip.net.comic;
 
-public class SubcribeResult {
-  String result;
+import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+
+public class UrlBuilder {
+
+  private final String endpoint;
+
+  public UrlBuilder(String endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  public String urlThumbnail(Strip strip) {
+    return endpoint +  "comics/thumbnail/" + strip._id;
+  }
+
+  public String urlImage(String stripId) {
+    return endpoint + "comics/image/" + stripId;
+  }
 }

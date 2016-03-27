@@ -17,6 +17,7 @@
 package net.coscolla.comicstrip.di;
 
 import net.coscolla.comicstrip.App;
+import net.coscolla.comicstrip.net.push.gcm.GcmMessageHandler;
 import net.coscolla.comicstrip.net.push.gcm.RegistrationIntentService;
 
 import javax.inject.Singleton;
@@ -29,7 +30,8 @@ import dagger.Component;
         AppModule.class,
         ComicApiModule.class,
         PushModule.class,
-        RepositoryModule.class
+        RepositoryModule.class,
+        HttpClientModule.class
     }
 )
 public interface AppComponent {
@@ -38,8 +40,12 @@ public interface AppComponent {
 
   void inject(RegistrationIntentService registrationIntentService);
 
+  void inject(GcmMessageHandler pushService);
+
   ListStripsComponent plus(ListStripsModule listStripsModule);
 
   DetailStripsComponent plus(DetailStripsModule detailStripsModule);
+
+  ComicsActivityComponent plus(ComicsModule comicsModule);
 }
 

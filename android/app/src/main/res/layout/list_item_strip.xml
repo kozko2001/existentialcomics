@@ -11,9 +11,17 @@
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="4dp">
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/preview"
+            android:src="@drawable/common_google_signin_btn_icon_light_focused"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

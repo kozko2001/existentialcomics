@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.list.ListStripsActivity">
+        <activity android:name=".ui.comics.ComicsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

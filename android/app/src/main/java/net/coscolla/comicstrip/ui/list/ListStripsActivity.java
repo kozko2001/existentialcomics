@@ -16,7 +16,9 @@
 
 package net.coscolla.comicstrip.ui.list;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,7 +35,9 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import timber.log.Timber;
 
 import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
 import net.coscolla.comicstrip.R;
@@ -46,11 +50,14 @@ import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
 
 import javax.inject.Inject;
 
+import static rx.schedulers.Schedulers.io;
+
 
 public class ListStripsActivity extends AppCompatActivity {
 
   private static final String LOGTAG = "ListStripsActivity";
   public static final String STRIPS = "strips";
+  public static final String INTENT_ARG_COMIC_NAME = "comicName";
 
   @Bind(R.id.list) RecyclerView list;
 
@@ -60,17 +67,35 @@ public class ListStripsActivity extends AppCompatActivity {
   @Inject StripAdapter listAdapter;
   @Inject ComicRepository repository;
 
+  private Subscription subscription; // Repository observable subscription
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_list_strips);
 
     Graph.getInstance().getListStripsComponent().inject(this);
+    setTitle(getComicName());
 
     ButterKnife.bind(this);
-    configureList();
 
-    requestStrips();
+    configureList();
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+
+    subscription = requestStrips();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+
+    if(subscription != null && !subscription.isUnsubscribed()) {
+      subscription.unsubscribe();
+    }
   }
 
   /**
@@ -85,14 +110,14 @@ public class ListStripsActivity extends AppCompatActivity {
   /**
    * Use the api to request the data to the comic service
    */
-  private void requestStrips() {
-    repository.getStrips("existentialcomics")
+  private Subscription requestStrips() {
+    return repository.getStrips(getComicName())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(strips -> {
           listData = strips;
           updateList();
         }, (error) -> {
-          Log.d(LOGTAG, "onFailure");
+          Timber.e(LOGTAG, "onFailure");
         });
   }
 
@@ -124,17 +149,54 @@ public class ListStripsActivity extends AppCompatActivity {
   }
 
   @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    Boolean isSubscribed = isComicPushNotificationSubscribed();
+
+    MenuItem togglePushNotification = menu.findItem(R.id.menu_push_notification);
+
+    int description = isSubscribed ? R.string.unsubscribe : R.string.subscribe;
+    int icon = isSubscribed ? R.mipmap.ic_favorite_white_36dp : R.mipmap.ic_favorite_border_white_36dp;
+
+    togglePushNotification.setTitle(description);
+    togglePushNotification.setIcon(icon);
+
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    if(item.getItemId() == R.id.menu_open_browser) {
-      String url = "http://existentialcomics.com/";
-      Intent i = new Intent(Intent.ACTION_VIEW);
-      i.setData(Uri.parse(url));
-      startActivity(i);
-      return true;
-    } else if( item.getItemId() == R.id.menu_debug_register) {
-      pushManager.subscribe("existential");
+    if(item.getItemId() == R.id.menu_push_notification) {
+      Boolean isSubscribed = isComicPushNotificationSubscribed();
+      if(!isSubscribed) {
+        repository.subscribe(getComicName())
+            .subscribeOn(io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                b -> {} ,
+                e -> {
+                  Timber.e(LOGTAG, "Error during the request to the push notification");
+                },
+                this::invalidateOptionsMenu);
+      } else {
+        // TODO: NOT  YET IMPLEMENTED ON THE BACKEND ....
+      }
     }
+
     return super.onOptionsItemSelected(item);
   }
 
+  private Boolean isComicPushNotificationSubscribed() {
+    Boolean isSubscribed = repository.isSubscribed(getComicName()).toBlocking().first();
+    return isSubscribed;
+  }
+
+  private String getComicName() {
+    return getIntent().getStringExtra(INTENT_ARG_COMIC_NAME);
+  }
+
+  public static Intent createIntent(Context context, String comicName) {
+    Intent intent = new Intent(context, ListStripsActivity.class);
+    intent.putExtra(INTENT_ARG_COMIC_NAME, comicName);
+    return intent;
+  }
 }

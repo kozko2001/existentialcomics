@@ -22,7 +22,6 @@ import android.util.Log;
 import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
 import com.pushtorefresh.storio.sqlite.impl.DefaultStorIOSQLite;
-import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
 import net.coscolla.comicstrip.net.comic.api.entities.Comic;
@@ -35,6 +34,8 @@ import net.coscolla.comicstrip.net.comic.db.resolvers.StripPutResolver;
 import net.coscolla.comicstrip.net.comic.db.resolvers.StripsDeleteResolver;
 import net.coscolla.comicstrip.net.comic.db.tables.ComicsTable;
 import net.coscolla.comicstrip.net.comic.db.tables.StripsTable;
+
+import java.util.List;
 
 import rx.Observable;
 
@@ -84,7 +85,7 @@ public class ComicCache {
   }
 
   @RxLogObservable
-  public Observable<Strip> listStrips(String comic) {
+  public Observable<List<Strip>> listStrips(String comic) {
     return storio.get()
         .listOfObjects(Strip.class)
         .withQuery(Query.builder()
@@ -94,14 +95,12 @@ public class ComicCache {
             .orderBy(StripsTable.COLUMN_ORDER + " DESC")
             .build())
         .prepare()
-        .asRxObservable()
-        .first()
-        .flatMap(Observable::from);
+        .asRxObservable();
   }
 
-  public void insertStrip(Strip strip) {
+  public void insertStrips(List<Strip> strips) {
     storio.put()
-        .object(strip)
+        .objects(strips)
         .prepare()
         .executeAsBlocking();
   }

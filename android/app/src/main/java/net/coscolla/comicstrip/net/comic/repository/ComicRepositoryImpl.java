@@ -22,53 +22,77 @@ import net.coscolla.comicstrip.net.comic.api.ComicApi;
 import net.coscolla.comicstrip.net.comic.api.entities.Comic;
 import net.coscolla.comicstrip.net.comic.api.entities.Strip;
 import net.coscolla.comicstrip.net.comic.db.ComicCache;
+import net.coscolla.comicstrip.net.push.PushManager;
 
 import java.util.List;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
+
+import static rx.schedulers.Schedulers.io;
 
 public class ComicRepositoryImpl implements ComicRepository {
 
   private final ComicApi api;
   private final ComicCache cache;
+  private final PushManager pushManager;
+  private String LOGTAG = "ComicRepositoryImpl";
 
-  public ComicRepositoryImpl(ComicApi api, ComicCache cache) {
+  public ComicRepositoryImpl(ComicApi api, ComicCache cache, PushManager pushManager) {
     this.api = api;
     this.cache = cache;
+    this.pushManager = pushManager;
   }
 
   @Override
   @RxLogObservable
-  public Observable<Comic> getComics() {
+  public Observable<List<Comic>> getComics() {
 
-    Observable<Comic> cacheObservable = cache.listComics();
-    Observable<Comic> network = listComicsApi();
+    Observable<List<Comic>> cacheObservable = cache.listComics().toList();
+    Observable<List<Comic>> network = listComicsApi()
+        .doOnNext(cache::insertComic)
+        .toList();
+
 
     return cacheObservable
         .concatWith(network)
-        .filter(comic -> comic != null)
-        .doOnNext(comic -> cache.insertComic(comic));
+        .filter(comic -> comic != null);
   }
 
   @Override
   @RxLogObservable
   public Observable<List<Strip>> getStrips(String comic) {
 
-    Observable<List<Strip>> cacheObservable = cache.listStrips(comic).toList();
-    Observable<List<Strip>> network = getStripsApi(comic)
-        .doOnNext(strip -> cache.insertStrip(strip))
-        .toList();
+    Observable<List<Strip>> dbObservable = cache.listStrips(comic);
 
-    return cacheObservable
-        .concatWith(network)
-        .filter(strip -> strip != null);
+    getStripsApi(comic)
+        .subscribeOn(io())
+        .subscribe((l) -> {
+
+        }, (e) -> {
+          Timber.e(LOGTAG, "Error fetching data from the api", e);
+        });
+
+    return dbObservable;
+  }
+
+  @Override
+  public Observable<Boolean> isSubscribed(String comic) {
+    return Observable.fromCallable(() -> pushManager.isSubscribed(comic));
+  }
+
+  @Override
+  public Observable<Boolean> subscribe(String comic) {
+    return pushManager.subscribe(comic)
+        .map(r -> true); // TODO: always is true on the backend
   }
 
 
-  public Observable<Strip> getStripsApi(String comic) {
+  public Observable<List<Strip>> getStripsApi(String comic) {
     return api.listStrips(comic)
-        .flatMap(result -> Observable.from(result.result));
+        .map(result -> result.result)
+        .doOnNext(cache::insertStrips);
   }
 
   @RxLogObservable

@@ -22,6 +22,7 @@ import net.coscolla.comicstrip.net.comic.api.ComicApi;
 import net.coscolla.comicstrip.net.comic.db.ComicCache;
 import net.coscolla.comicstrip.net.comic.repository.ComicRepositoryImpl;
 import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
+import net.coscolla.comicstrip.net.push.PushManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,7 +36,7 @@ public class RepositoryModule {
   }
 
   @Provides
-  public ComicRepository providesRepository(ComicApi api, ComicCache cache) {
-    return new ComicRepositoryImpl(api, cache);
+  public ComicRepository providesRepository(ComicApi api, ComicCache cache, PushManager pushManager) {
+    return new ComicRepositoryImpl(api, cache, pushManager);
   }
 }

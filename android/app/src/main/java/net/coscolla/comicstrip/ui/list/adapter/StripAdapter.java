@@ -1,24 +1,35 @@
 package net.coscolla.comicstrip.ui.list.adapter;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Collections;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+
 import java.util.List;
 
 import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.net.comic.UrlBuilder;
 import net.coscolla.comicstrip.net.comic.api.entities.Strip;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
   public static final String SELECTED = "selected";
+  public final UrlBuilder urlBuilder;
 
   private List<Strip> data;
   private AdapterCallback<Strip> callback;
+
+  public StripAdapter(UrlBuilder urlBuilder) {
+    this.urlBuilder = urlBuilder;
+  }
 
   public void setCallback(AdapterCallback<Strip> callback) {
     this.callback = callback;
@@ -33,7 +44,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
   public StripViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext()).inflate(
         R.layout.list_item_strip, parent, false);
-    return new StripViewHolder(view, callback);
+    return new StripViewHolder(view, callback, urlBuilder);
   }
 
   @Override
@@ -54,24 +65,36 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
 class StripViewHolder extends RecyclerView.ViewHolder {
 
+  private final ImageView imageView;
+  private final UrlBuilder urlBuilder;
   private TextView title;
   private Strip data;
   private AdapterCallback<Strip> callback;
 
-  public StripViewHolder (View itemView, AdapterCallback<Strip> callback) {
+  public StripViewHolder (View itemView, AdapterCallback<Strip> callback, UrlBuilder urlBuilder) {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
+    this.imageView = (ImageView) itemView.findViewById(R.id.preview);
     this.callback = callback;
-    itemView.setOnClickListener(ppp);
+    this.urlBuilder = urlBuilder;
+
+    itemView.setOnClickListener(onRowSelected);
   }
 
   public void bind(Strip strip) {
     this.data = strip;
     title.setText(strip.title);
+
+    String imageUrl = urlBuilder.urlThumbnail(strip);
+
+    Glide.with(itemView.getContext())
+        .load(imageUrl)
+        .centerCrop()
+        .into(imageView);
   }
 
-  private final View.OnClickListener ppp = new View.OnClickListener() {
+  private final View.OnClickListener onRowSelected = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       if(callback != null) {

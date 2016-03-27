@@ -25,24 +25,28 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.GsonConverterFactory;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class PushModule {
 
   @Provides
-  public PushRestService providesComicApi(@Named("endpoint") String endpoint) {
+  public PushRestService providesComicApi(@Named("endpoint") String endpoint, OkHttpClient client) {
     Retrofit retrofit = new Retrofit.Builder()
         .baseUrl(endpoint)
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        .client(client)
         .build();
 
     return retrofit.create(PushRestService.class);
   }
 
   @Provides
-  public PushManager providesPushManager(Context appContext) {
-    return new PushManager(appContext);
+  public PushManager providesPushManager(Context appContext, PushRestService restService) {
+    return new PushManager(appContext, restService);
   }
 }

@@ -16,28 +16,36 @@
 
 package net.coscolla.comicstrip.di;
 
+import net.coscolla.comicstrip.net.comic.UrlBuilder;
 import net.coscolla.comicstrip.net.comic.api.ComicApi;
 
 import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.GsonConverterFactory;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class ComicApiModule {
 
   @Provides
-  public ComicApi providesComicApi(@Named("endpoint") String endpoint) {
+  public ComicApi providesComicApi(@Named("endpoint") String endpoint, OkHttpClient client) {
 
     Retrofit retrofit = new Retrofit.Builder()
         .baseUrl(endpoint)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        .client(client)
         .build();
 
     return retrofit.create(ComicApi.class);
+  }
+
+  @Provides
+  public UrlBuilder providesUrlBuilder(@Named("endpoint") String endpoint) {
+    return new UrlBuilder(endpoint);
   }
 }

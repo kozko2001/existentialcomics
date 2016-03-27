@@ -31,6 +31,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
+import net.coscolla.comicstrip.net.comic.UrlBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,6 +53,7 @@ public class DetailStripPage extends Fragment {
 
 
   @Inject @Named("endpoint") String apiEndpoint;
+  @Inject UrlBuilder urlBuilder;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,7 +110,7 @@ public class DetailStripPage extends Fragment {
   }
 
   private void loadImageFromNetwork() {
-    final String imageUrl = apiEndpoint + "comics/image/" + id;
+    final String imageUrl = urlBuilder.urlImage(id);
 
     Glide.with(this)
         .load(imageUrl)

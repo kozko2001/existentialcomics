@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.comic.api.entities.Comic;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.ui.comics.ComicsActivity;
 
-import java.util.List;
+import dagger.Subcomponent;
 
-import rx.Observable;
-
-public interface ComicRepository {
-
-  Observable<List<Comic>> getComics();
-
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
+@ActivityScope
+@Subcomponent(modules = {
+    ComicsModule.class
+})
+public interface ComicsActivityComponent {
+  void inject(ComicsActivity activity);
 }

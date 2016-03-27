@@ -20,8 +20,10 @@ import net.coscolla.comicstrip.net.push.PushRestService;
 
 import javax.inject.Inject;
 
+import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class RegistrationIntentService extends IntentService {
 
@@ -70,7 +72,7 @@ public class RegistrationIntentService extends IntentService {
     PushRegisterRequestData data = new PushRegisterRequestData(token);
     pushService.register(data).enqueue(new Callback<PushRegisterResponse>() {
       @Override
-      public void onResponse(Response<PushRegisterResponse> response) {
+      public void onResponse(Call<PushRegisterResponse> call, Response<PushRegisterResponse> response) {
         if(response.body() != null) {
           String userId = response.body().id;
           pushManager.setUserId(userId);
@@ -78,8 +80,10 @@ public class RegistrationIntentService extends IntentService {
       }
 
       @Override
-      public void onFailure(Throwable t) {
+      public void onFailure(Call<PushRegisterResponse> call, Throwable t) {
+        Timber.e(t, "Could not send the registration token to the server");
       }
+
     });
   }
 }
