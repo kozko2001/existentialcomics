@@ -27,6 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.common.collect.Lists;
+
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Comic;
@@ -35,6 +37,7 @@ import net.coscolla.comicstrip.usecases.ListComicsUseCase;
 
 import org.parceler.Parcels;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -94,17 +97,13 @@ public class ComicsActivity extends AppCompatActivity {
   /**
    * Stores the current data in the recycler view
    *
-   * @param outState
+   * @param outState bundle to store the current data
    */
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     if(data != null && data.size() > 0){
-      List<Parcelable> storageData = from(data)
-          .map(Parcels::wrap)
-          .toList()
-          .toBlocking()
-          .first();
+      List<Parcelable> storageData = Lists.transform(data, Parcels::wrap);
 
       outState.putParcelableArray(SAVED_INSTANCE_ARG_COMICS, storageData.toArray(new Parcelable[storageData.size()]));
     }
@@ -113,17 +112,13 @@ public class ComicsActivity extends AppCompatActivity {
   /**
    * Restores the data to fill the recycler view adapter
    *
-   * @param savedInstanceState
+   * @param savedInstanceState bundle with the information of the last state
    */
   private void restoreFromPreviousInstance(@NonNull  Bundle savedInstanceState) {
     Parcelable[] storageData = savedInstanceState.getParcelableArray(SAVED_INSTANCE_ARG_COMICS);
     if(storageData != null && storageData.length > 0) {
-      this.data = from(storageData)
-          .map(Parcels::unwrap)
-          .cast(ComicAdapterModel.class)
-          .toList()
-          .toBlocking()
-          .first();
+      this.data = Lists.transform(Arrays.asList(storageData),
+          (d) -> Parcels.unwrap((Parcelable) d));
     }
   }
 
@@ -165,8 +160,8 @@ public class ComicsActivity extends AppCompatActivity {
   }
 
   /**
-   * Shows an error on the
-   * @param message
+   * Shows an error on the view
+   * @param message error message to be shown
    */
   private void showError(String message) {
     Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
@@ -204,7 +199,7 @@ public class ComicsActivity extends AppCompatActivity {
   }
 
   /**
-   * Updates the recyclerview adapter
+   * Updates the recycler view adapter
    */
   private void updateAdapter() {
     this.listAdapter.setData(data);

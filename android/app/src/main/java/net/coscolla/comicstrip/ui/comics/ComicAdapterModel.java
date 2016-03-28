@@ -18,6 +18,12 @@ package net.coscolla.comicstrip.ui.comics;
 
 import org.parceler.Parcel;
 
+/**
+ * Model for the select comics list
+ *
+ * Now is a bit unnecessary but is expected to have more data like if the
+ * comic is favorite and be sorted by the time you see strips of this comic etc...
+ */
 @Parcel
 public class ComicAdapterModel {
   public String comicName;
