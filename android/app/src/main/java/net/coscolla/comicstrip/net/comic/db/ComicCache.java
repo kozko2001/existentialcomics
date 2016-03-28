@@ -17,6 +17,7 @@
 package net.coscolla.comicstrip.net.comic.db;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.fernandocejas.frodo.annotation.RxLogObservable;
@@ -88,14 +89,40 @@ public class ComicCache {
   public Observable<List<Strip>> listStrips(String comic) {
     return storio.get()
         .listOfObjects(Strip.class)
-        .withQuery(Query.builder()
-            .table(StripsTable.TABLE)
-            .where(StripsTable.COLUMN_COMIC + " = ? ")
-            .whereArgs(comic)
-            .orderBy(StripsTable.COLUMN_ORDER + " DESC")
-            .build())
+        .withQuery(cacheStripsSortedByOrderQuery(comic).build())
         .prepare()
         .asRxObservable();
+  }
+
+  @NonNull
+  private Query.CompleteBuilder cacheStripsSortedByOrderQuery(String comic) {
+    return Query.builder()
+        .table(StripsTable.TABLE)
+        .where(StripsTable.COLUMN_COMIC + " = ? ")
+        .whereArgs(comic)
+        .orderBy(StripsTable.COLUMN_ORDER + " DESC");
+  }
+
+  /**
+   * Obtains the most new id strip from the cache or null if cache is empty
+   *
+   * @param comic
+   * @return
+   */
+  public String lastStripId(String comic) {
+    Strip firstStrip = storio.get()
+        .object(Strip.class)
+        .withQuery(cacheStripsSortedByOrderQuery(comic)
+            .limit(1)
+            .build())
+        .prepare()
+        .executeAsBlocking();
+
+    if(firstStrip != null) {
+      return firstStrip._id;
+    } else {
+      return null;
+    }
   }
 
   public void insertStrips(List<Strip> strips) {

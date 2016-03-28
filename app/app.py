@@ -4,6 +4,7 @@ from bson import json_util, ObjectId
 import json
 import gridfs
 import requests
+from itertools import takewhile
 
 app = Flask(__name__)
 
@@ -15,6 +16,7 @@ fs = gridfs.GridFSBucket(db)
 
 
 class JSONEncoder(json.JSONEncoder):
+
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
@@ -34,16 +36,32 @@ def listComics():
 
 @app.route("/comics/<comic>")
 def get_comic(comic):
-    projection = ['comic', 'title', 'text', 'url', 'order']
-    result = comics.find({
-        'comic': comic
-    }, projection)
+    return get_comic_until_id(comic, None)
 
-    data = json.loads(JSONEncoder().encode(list(result)))  # Ugly hack to remove objectid
+
+@app.route("/comics/<comic>/<last_id>")
+def get_comic_until_id(comic, last_id):
+    """
+    Get the data from the mongodb, if client send us which is the last id they
+    have received, we only send back the new data
+
+    {
+        result: [ {strip1}, {strip2}, ...]
+    }
+    """
+    projection = ['comic', 'title', 'text', 'url', 'order']
+    try:
+        last_id = ObjectId(last_id)
+    except:
+        last_id = None
+
+    cursor = comics.find({'comic': comic}, projection).sort('order', pymongo.DESCENDING)
+    cursor = takewhile(lambda x: x['_id'] != last_id, cursor)
+
+    data = json.loads(JSONEncoder().encode(list(cursor)))  # Ugly hack to remove objectid
     result = {
         'result': data
     }
-
     return jsonify(result)
 
 
@@ -106,6 +124,15 @@ def subscribe(user_id, topic):
     print r
 
     return jsonify({"result": "ok"})
+
+
+@app.route("/unsubscribe/<user_id>")
+def unsubscribe(user_id):
+    r = requests.delete("http://push:8081/subscriber/%s" % user_id)
+    print r
+
+    return jsonify({"result": "ok"})
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

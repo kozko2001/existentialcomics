@@ -42,4 +42,4 @@ class XKCDSpider(BaseSpider):
 
     def getOrderFromUrl(self, url):
         m = re.search('\/(\d+)', url)
-        return m.group(1)
+        return int(m.group(1))

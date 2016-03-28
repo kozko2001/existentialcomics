@@ -44,15 +44,10 @@ public class PushManager {
   private static final String PUSH_USER_ID = "PUSH_USER_ID";
   private static final String TOPICS_SUBSCRIBED = "TOPICS_SUBSCRIBED";
 
-  /**
-   * Array of topics that are not yet subscribed
-   */
-  private final ArrayList<String> pendingTopics;
   private final PushRestService pushApi;
 
   public PushManager(Context appContext, PushRestService restService) {
     context = appContext;
-    pendingTopics = new ArrayList<String>();
     this.pushApi = restService;
   }
 
@@ -84,6 +79,19 @@ public class PushManager {
     }
 
   /**
+   * Unsubscribes from the backend from a previously subscribed topic
+   *
+   * @param topic
+   * @return Observable with the results
+   */
+  public Observable<SubscribeResult> unsubscribe(@NonNull final String topic) {
+    return pushApi.unsubscribe(getUserId())
+        .doOnNext(result -> removeSubscribedTo(topic));
+  }
+
+
+
+  /**
    * When we have been subscribed to some topic store it in the local
    *
    * @param topic on to be subscribed
@@ -93,6 +101,20 @@ public class PushManager {
     Set<String> subscribed = new HashSet<>(sharedPreferences.getStringSet(TOPICS_SUBSCRIBED, new HashSet<>()));
 
     subscribed.add(topic);
+
+    sharedPreferences.edit().putStringSet(TOPICS_SUBSCRIBED, subscribed).commit();
+  }
+
+  /**
+   * Remove from the local setting that we are no longer subscribed to this topic
+   *
+   * @param topic name of the comic
+   */
+  private void removeSubscribedTo(String topic) {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    Set<String> subscribed = new HashSet<>(sharedPreferences.getStringSet(TOPICS_SUBSCRIBED, new HashSet<>()));
+
+    subscribed.remove(topic);
 
     sharedPreferences.edit().putStringSet(TOPICS_SUBSCRIBED, subscribed).commit();
   }

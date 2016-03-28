@@ -167,19 +167,21 @@ public class ListStripsActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     if(item.getItemId() == R.id.menu_push_notification) {
       Boolean isSubscribed = isComicPushNotificationSubscribed();
+      Observable<Boolean> subscribe;
       if(!isSubscribed) {
-        repository.subscribe(getComicName())
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                b -> {} ,
-                e -> {
-                  Timber.e(LOGTAG, "Error during the request to the push notification");
-                },
-                this::invalidateOptionsMenu);
+        subscribe = repository.subscribe(getComicName());
       } else {
-        // TODO: NOT  YET IMPLEMENTED ON THE BACKEND ....
+        subscribe = repository.unsubscribe(getComicName());
       }
+
+      subscribe.subscribeOn(io())
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribe(
+              b -> {} ,
+              e -> {
+                Timber.e(LOGTAG, "Error during the request to the push notification");
+              },
+              this::invalidateOptionsMenu);
     }
 
     return super.onOptionsItemSelected(item);

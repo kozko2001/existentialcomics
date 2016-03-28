@@ -31,7 +31,7 @@ class ExistentialSpider(BaseSpider):
             item['image_urls'] = response.xpath("//img[@class='comicImg']/@src").extract()
             item['subtext'] = response.xpath("string(//div[@id='explainHidden'])").extract_first()
             item['url'] = response.url
-            item['order'] = order
+            item['order'] = int(order)
 
             yield item
 

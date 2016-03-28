@@ -25,6 +25,6 @@ public interface ComicApi {
   @GET("/comics")
   Observable<ComicResults> listComics();
 
-  @GET("/comics/{comicname}")
-  Observable<StripResults> listStrips(@Path("comicname") String comicName);
+  @GET("/comics/{comicname}/{last_id}")
+  Observable<StripResults> listStrips(@Path("comicname") String comicName, @Path("last_id") String lastId);
 }

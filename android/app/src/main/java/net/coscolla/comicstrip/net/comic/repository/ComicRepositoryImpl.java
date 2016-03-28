@@ -88,9 +88,20 @@ public class ComicRepositoryImpl implements ComicRepository {
         .map(r -> true); // TODO: always is true on the backend
   }
 
+  @Override
+  public Observable<Boolean> unsubscribe(String comic) {
+    return pushManager.unsubscribe(comic)
+        .map(r -> true);
+  }
 
   public Observable<List<Strip>> getStripsApi(String comic) {
-    return api.listStrips(comic)
+    String lastId = cache.lastStripId(comic);
+
+    if(lastId == null) {
+      lastId = "unknown";
+    }
+
+    return api.listStrips(comic, lastId)
         .map(result -> result.result)
         .doOnNext(cache::insertStrips);
   }

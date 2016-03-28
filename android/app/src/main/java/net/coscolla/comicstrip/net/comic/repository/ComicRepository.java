@@ -32,4 +32,6 @@ public interface ComicRepository {
   Observable<Boolean> isSubscribed(String comic);
 
   Observable<Boolean> subscribe(String comic);
+
+  Observable<Boolean> unsubscribe(String comic);
 }
