@@ -18,13 +18,10 @@ package net.coscolla.comicstrip.ui.list;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -42,9 +39,9 @@ import timber.log.Timber;
 import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
-import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
 
@@ -178,9 +175,7 @@ public class ListStripsActivity extends AppCompatActivity {
           .observeOn(AndroidSchedulers.mainThread())
           .subscribe(
               b -> {} ,
-              e -> {
-                Timber.e(LOGTAG, "Error during the request to the push notification");
-              },
+              e -> Timber.e(LOGTAG, "Error during the request to the push notification"),
               this::invalidateOptionsMenu);
     }
 
@@ -188,8 +183,7 @@ public class ListStripsActivity extends AppCompatActivity {
   }
 
   private Boolean isComicPushNotificationSubscribed() {
-    Boolean isSubscribed = repository.isSubscribed(getComicName()).toBlocking().first();
-    return isSubscribed;
+    return repository.isSubscribed(getComicName()).toBlocking().first();
   }
 
   private String getComicName() {

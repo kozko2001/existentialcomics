@@ -17,8 +17,8 @@
 package net.coscolla.comicstrip.di;
 
 import net.coscolla.comicstrip.App;
-import net.coscolla.comicstrip.net.push.gcm.GcmMessageHandler;
-import net.coscolla.comicstrip.net.push.gcm.RegistrationIntentService;
+import net.coscolla.comicstrip.push.gcm.GcmMessageHandler;
+import net.coscolla.comicstrip.push.gcm.RegistrationIntentService;
 
 import javax.inject.Singleton;
 

@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.net.api;
 
-import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
 
 import java.util.List;
 
-import rx.Observable;
+public class StripResults {
 
-public interface ComicRepository {
+  public List<Strip> result;
 
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
 }
+

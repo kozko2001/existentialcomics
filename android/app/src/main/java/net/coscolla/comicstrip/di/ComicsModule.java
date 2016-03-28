@@ -16,9 +16,12 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.ui.comics.ComicAdapter;
 import net.coscolla.comicstrip.ui.comics.ComicsActivity;
+import net.coscolla.comicstrip.ui.comics.ListComicsUseCaseImpl;
+import net.coscolla.comicstrip.usecases.ListComicsUseCase;
 
 import dagger.Module;
 import dagger.Provides;
@@ -40,5 +43,10 @@ public class ComicsModule {
   @Provides
   public ComicAdapter providesComicAdapter() {
     return new ComicAdapter();
+  }
+
+  @Provides
+  public ListComicsUseCase providesUseCase(ComicCache cache, ComicApi api) {
+    return new ListComicsUseCaseImpl(cache, api);
   }
 }

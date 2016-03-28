@@ -21,16 +21,17 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.api.entities.Comic;
-import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
+import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.ui.list.ListStripsActivity;
+import net.coscolla.comicstrip.usecases.ListComicsUseCase;
 
 import org.parceler.Parcels;
 
@@ -41,6 +42,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
@@ -52,9 +54,19 @@ public class ComicsActivity extends AppCompatActivity {
   private static final String SAVED_INSTANCE_ARG_COMICS = "DATA_SAVED_LIST";
 
   @Bind(R.id.list) RecyclerView list;
+
+  @Bind(R.id.main_content) CoordinatorLayout coordinatorLayout;
+
   @Inject ComicAdapter listAdapter;
-  @Inject ComicRepository repository;
+
+  @Inject ListComicsUseCase useCase;
+
+  /**
+   * data that the adapter is currently using
+   */
   private List<ComicAdapterModel> data;
+
+  private Subscription subscription;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,23 +82,32 @@ public class ComicsActivity extends AppCompatActivity {
 
     configureList();
 
+    startListeningModel();
+
     if(data == null) {
-      requestComics();
+      requestData();
     } else {
       updateAdapter();
     }
   }
 
   /**
-   * Launches a request to the repository and fills the adapter with the data
+   * Stores the current data in the recycler view
+   *
+   * @param outState
    */
-  private void requestComics() {
-    repository.getComics()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::onDataReceived,
-            (e) -> {
-              Timber.e(e, "ComicsActivity: Error downloading comics from the api");
-            });
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    if(data != null && data.size() > 0){
+      List<Parcelable> storageData = from(data)
+          .map(Parcels::wrap)
+          .toList()
+          .toBlocking()
+          .first();
+
+      outState.putParcelableArray(SAVED_INSTANCE_ARG_COMICS, storageData.toArray(new Parcelable[storageData.size()]));
+    }
   }
 
   /**
@@ -106,23 +127,51 @@ public class ComicsActivity extends AppCompatActivity {
     }
   }
 
-  /**
-   * Stores the current data in the recycler view
-   * @param outState
-   */
   @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    if(data != null && data.size() > 0){
-      List<Parcelable> storageData = from(data)
-          .map(Parcels::wrap)
-          .toList()
-          .toBlocking()
-          .first();
+  protected void onDestroy() {
+    super.onDestroy();
 
-      outState.putParcelableArray(SAVED_INSTANCE_ARG_COMICS, storageData.toArray(new Parcelable[storageData.size()]));
+    if(subscription != null && !subscription.isUnsubscribed()) {
+      subscription.unsubscribe();
     }
   }
+
+  /**
+   * Launches a request to the repository and fills the adapter with the data
+   */
+  private void startListeningModel() {
+    subscription = useCase.getComicsObservable()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            this::onDataReceived,
+            (e) -> Timber.e(e, "Error downloading comics from the api"));
+  }
+
+  /**
+   * Request the data from the backend and stores them into the cache, so the cache observable
+   * will trigger and reload the data
+   */
+  private void requestData() {
+    useCase.refresh()
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            list -> Timber.d("New %d comics fetched ", list.size()),
+            (e) -> {
+              Timber.e(e, "Couldn't retrieve updated data");
+              showError("Couldn't retrieve updated data");
+            },
+            ()  -> Timber.d("request for comics completed")
+        );
+  }
+
+  /**
+   * Shows an error on the
+   * @param message
+   */
+  private void showError(String message) {
+    Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
+  }
+
 
   /**
    * When the data is received either from network or from cache update the list
@@ -143,13 +192,12 @@ public class ComicsActivity extends AppCompatActivity {
   /**
    * Converts the raw comic api to the model for the adapter
    * @param comics list of strings with the comics name
-   * @return list of ComicAdapterModel with the comic name and if has notification activated
+   * @return list of ComicAdapterModel with the comic name
    */
   private List<ComicAdapterModel> convertToModel(List<String> comics) {
 
-    Observable<Boolean> subscribed = from(comics).flatMap(repository::isSubscribed);
-
-    return zip(from(comics), subscribed, ComicAdapterModel::new)
+    return from(comics)
+        .map(ComicAdapterModel::new)
         .toList()
         .toBlocking()
         .first();
@@ -170,10 +218,6 @@ public class ComicsActivity extends AppCompatActivity {
     listAdapter.setCallback((eventName, comic) -> {
       if(eventName.equalsIgnoreCase(ComicAdapter.SELECTED)) {
         openStrips(comic);
-      }
-
-      if(eventName.equalsIgnoreCase(ComicAdapter.LONG_SELECTED)) {
-        // TODO: show the options
       }
     });
     list.setLayoutManager(new LinearLayoutManager(this));

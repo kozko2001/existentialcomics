@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.push.api;
 
-import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
+public class PushRegisterRequestData {
+  public String token;
+  public String proto = "gcm";
 
-import java.util.List;
-
-import rx.Observable;
-
-public interface ComicRepository {
-
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
+  public PushRegisterRequestData(String token) {
+    this.token = token;
+  }
 }

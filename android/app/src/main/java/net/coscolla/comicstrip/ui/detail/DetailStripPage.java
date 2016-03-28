@@ -31,10 +31,9 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.UrlBuilder;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -52,7 +51,6 @@ public class DetailStripPage extends Fragment {
   private PhotoViewAttacher photoViewAttacher;
 
 
-  @Inject @Named("endpoint") String apiEndpoint;
   @Inject UrlBuilder urlBuilder;
 
   @Override

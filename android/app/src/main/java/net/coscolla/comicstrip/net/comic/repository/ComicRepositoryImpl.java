@@ -18,16 +18,15 @@ package net.coscolla.comicstrip.net.comic.repository;
 
 import com.fernandocejas.frodo.annotation.RxLogObservable;
 
-import net.coscolla.comicstrip.net.comic.api.ComicApi;
-import net.coscolla.comicstrip.net.comic.api.entities.Comic;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
-import net.coscolla.comicstrip.net.comic.db.ComicCache;
-import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.net.api.ComicApi;
+import net.coscolla.comicstrip.entities.Comic;
+import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.push.PushManager;
 
 import java.util.List;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
 import static rx.schedulers.Schedulers.io;
@@ -45,20 +44,6 @@ public class ComicRepositoryImpl implements ComicRepository {
     this.pushManager = pushManager;
   }
 
-  @Override
-  @RxLogObservable
-  public Observable<List<Comic>> getComics() {
-
-    Observable<List<Comic>> cacheObservable = cache.listComics().toList();
-    Observable<List<Comic>> network = listComicsApi()
-        .doOnNext(cache::insertComic)
-        .toList();
-
-
-    return cacheObservable
-        .concatWith(network)
-        .filter(comic -> comic != null);
-  }
 
   @Override
   @RxLogObservable

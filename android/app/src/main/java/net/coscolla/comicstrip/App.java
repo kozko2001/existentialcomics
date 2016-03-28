@@ -1,10 +1,9 @@
 package net.coscolla.comicstrip;
 
 import android.app.Application;
-import android.util.Log;
 
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.push.PushManager;
 
 import javax.inject.Inject;
 

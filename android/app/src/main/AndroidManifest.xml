@@ -31,9 +31,9 @@
         <activity android:name=".ui.list.ListStripsActivity" />
 
         <!-- GCM -->
-        <service android:name=".net.push.gcm.RegistrationIntentService" android:exported="false"/>
+        <service android:name=".push.gcm.RegistrationIntentService" android:exported="false"/>
         <service
-            android:name=".net.push.gcm.GcmInstanceIDRenewService"
+            android:name=".push.gcm.GcmInstanceIDRenewService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
@@ -49,7 +49,7 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".net.push.gcm.GcmMessageHandler"
+            android:name=".push.gcm.GcmMessageHandler"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />

@@ -20,11 +20,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.net.push.PushManager;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 
 import java.util.List;

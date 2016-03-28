@@ -18,8 +18,8 @@ package net.coscolla.comicstrip.di;
 
 import android.content.Context;
 
-import net.coscolla.comicstrip.net.push.PushManager;
-import net.coscolla.comicstrip.net.push.PushRestService;
+import net.coscolla.comicstrip.push.PushManager;
+import net.coscolla.comicstrip.push.api.PushRestService;
 
 import javax.inject.Named;
 

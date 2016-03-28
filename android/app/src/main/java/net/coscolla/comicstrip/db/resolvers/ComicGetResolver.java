@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.db.resolvers;
+
+import android.database.Cursor;
+import android.support.annotation.NonNull;
+
+import com.pushtorefresh.storio.sqlite.operations.get.DefaultGetResolver;
 
 import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.db.tables.ComicsTable;
 
-import java.util.List;
+public class ComicGetResolver extends DefaultGetResolver<Comic> {
 
-import rx.Observable;
+  @NonNull
+  @Override
+  public Comic mapFromCursor(@NonNull Cursor cursor) {
+    Comic comic = new Comic();
 
-public interface ComicRepository {
+    String name = cursor.getString(cursor.getColumnIndexOrThrow(ComicsTable.COLUMN_NAME));
 
-  Observable<List<Strip>> getStrips(String comic);
+    comic.name = name;
 
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
+    return comic;
+  }
 }

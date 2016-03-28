@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.net.api;
 
-import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
 
-import java.util.List;
-
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 import rx.Observable;
 
-public interface ComicRepository {
+public interface ComicApi {
+  @GET("/comics")
+  Observable<ComicResults> listComics();
 
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
+  @GET("/comics/{comicname}/{last_id}")
+  Observable<StripResults> listStrips(@Path("comicname") String comicName, @Path("last_id") String lastId);
 }

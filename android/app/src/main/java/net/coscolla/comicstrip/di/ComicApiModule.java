@@ -16,8 +16,8 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.comic.UrlBuilder;
-import net.coscolla.comicstrip.net.comic.api.ComicApi;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
+import net.coscolla.comicstrip.net.api.ComicApi;
 
 import javax.inject.Named;
 

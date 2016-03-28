@@ -16,7 +16,7 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.net.comic.UrlBuilder;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
 
 import dagger.Module;

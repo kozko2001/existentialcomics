@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.detail.adapter.DetailStripPageAdapter;
 
 
@@ -54,7 +54,6 @@ public class DetailStripActivity extends AppCompatActivity {
     ButterKnife.bind(this);
 
     setupPageAdapter();
-    //this.setTitle(strip.title);
   }
 
   private void setupPageAdapter() {

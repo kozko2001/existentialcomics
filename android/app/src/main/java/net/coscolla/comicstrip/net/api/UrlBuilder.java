@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.net.api;
 
-import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
 
-import java.util.List;
+public class UrlBuilder {
 
-import rx.Observable;
+  private final String endpoint;
 
-public interface ComicRepository {
+  public UrlBuilder(String endpoint) {
+    this.endpoint = endpoint;
+  }
 
-  Observable<List<Strip>> getStrips(String comic);
+  public String urlThumbnail(Strip strip) {
+    return endpoint +  "comics/thumbnail/" + strip._id;
+  }
 
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
+  public String urlImage(String stripId) {
+    return endpoint + "comics/image/" + stripId;
+  }
 }

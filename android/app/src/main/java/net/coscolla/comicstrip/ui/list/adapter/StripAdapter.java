@@ -1,6 +1,5 @@
 package net.coscolla.comicstrip.ui.list.adapter;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.util.List;
 
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.net.comic.UrlBuilder;
-import net.coscolla.comicstrip.net.comic.api.entities.Strip;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
+import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{

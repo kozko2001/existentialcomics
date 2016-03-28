@@ -21,14 +21,12 @@ import org.parceler.Parcel;
 @Parcel
 public class ComicAdapterModel {
   public String comicName;
-  public boolean hasNotificationActivated;
 
   public ComicAdapterModel() {
 
   }
 
-  public ComicAdapterModel(String name, boolean hasNotification) {
+  public ComicAdapterModel(String name) {
     this.comicName = name;
-    this.hasNotificationActivated = hasNotification;
   }
 }

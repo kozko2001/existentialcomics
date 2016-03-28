@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.db.tables;
 
-import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
+public class ComicsTable {
 
-import java.util.List;
+  public static final String TABLE = "comics";
 
-import rx.Observable;
+  public static final String COLUMN_NAME = "name";
 
-public interface ComicRepository {
 
-  Observable<List<Strip>> getStrips(String comic);
-
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
+  public static String getCreateTableQuery() {
+    return "CREATE TABLE " + TABLE + " ( "
+        + COLUMN_NAME + " TEXT NOT NULL "
+        + ");";
+  }
 }

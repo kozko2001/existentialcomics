@@ -18,11 +18,11 @@ package net.coscolla.comicstrip.di;
 
 import android.content.Context;
 
-import net.coscolla.comicstrip.net.comic.api.ComicApi;
-import net.coscolla.comicstrip.net.comic.db.ComicCache;
+import net.coscolla.comicstrip.net.api.ComicApi;
+import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.net.comic.repository.ComicRepositoryImpl;
 import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
-import net.coscolla.comicstrip.net.push.PushManager;
+import net.coscolla.comicstrip.push.PushManager;
 
 import dagger.Module;
 import dagger.Provides;
