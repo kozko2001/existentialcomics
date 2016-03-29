@@ -18,12 +18,18 @@ package net.coscolla.comicstrip.ui.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+
+
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 
 import org.parceler.Parcels;
 
@@ -44,6 +50,8 @@ import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
 import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
+import net.coscolla.comicstrip.usecases.ListStripsUseCase;
+import net.coscolla.comicstrip.usecases.PushSubscribeUseCase;
 
 import javax.inject.Inject;
 
@@ -52,19 +60,23 @@ import static rx.schedulers.Schedulers.io;
 
 public class ListStripsActivity extends AppCompatActivity {
 
-  private static final String LOGTAG = "ListStripsActivity";
-  public static final String STRIPS = "strips";
   public static final String INTENT_ARG_COMIC_NAME = "comicName";
 
   @Bind(R.id.list) RecyclerView list;
 
+  @Bind(R.id.main_content) CoordinatorLayout coordinatorLayout;
+
   private List<Strip> listData;
 
   @Inject PushManager pushManager;
-  @Inject StripAdapter listAdapter;
-  @Inject ComicRepository repository;
 
-  private Subscription subscription; // Repository observable subscription
+  @Inject StripAdapter listAdapter;
+
+  @Inject ListStripsUseCase useCase;
+
+  @Inject PushSubscribeUseCase subscribeUseCase;
+
+  private Subscription subscription;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +88,62 @@ public class ListStripsActivity extends AppCompatActivity {
 
     ButterKnife.bind(this);
 
+
     configureList();
+
+    startListeningModel();
+
+    if(savedInstanceState == null) {
+      request();
+    }
   }
 
   @Override
-  protected void onStart() {
-    super.onStart();
-
-    subscription = requestStrips();
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
+  protected void onDestroy() {
+    super.onDestroy();
 
     if(subscription != null && !subscription.isUnsubscribed()) {
       subscription.unsubscribe();
     }
+  }
+
+  /**
+   * Starts observing the model and updates the list if there is new data
+   */
+  private void startListeningModel() {
+    subscription = useCase.observableModel(getComicName())
+        .subscribeOn(io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            this::updateList,
+            e -> Timber.e(e, "Error on the model subscriber"),
+            () -> Timber.d("Model listener subscription finalized")
+        );
+  }
+
+  /**
+   * Makes a new request and updates the data of the model
+   */
+  private void request() {
+    useCase.refresh(getComicName())
+        .subscribeOn(io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            list -> Timber.d("new %d strips fetched from the network", list.size()),
+            e -> {
+              Timber.e(e, "Couldn't get the new strips from the network");
+              showError("Could'nt retrieve the updated data");
+            },
+            () -> Timber.d("Strips requests completed")
+        );
+  }
+
+  /**
+   * Shows an error on the view
+   * @param message error message to be shown
+   */
+  private void showError(String message) {
+    Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
   }
 
   /**
@@ -105,37 +156,42 @@ public class ListStripsActivity extends AppCompatActivity {
   }
 
   /**
-   * Use the api to request the data to the comic service
+   * Callback to receive which item of the list was selected
+   *
+   * Go to the strip image activity
    */
-  private Subscription requestStrips() {
-    return repository.getStrips(getComicName())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(strips -> {
-          listData = strips;
-          updateList();
-        }, (error) -> {
-          Timber.e(LOGTAG, "onFailure");
-        });
-  }
-
   private AdapterCallback<Strip> adapterCallback = ((eventName, model) -> {
     if(eventName == StripAdapter.SELECTED) {
-      List<String> listIds = Observable.from(listData)
-          .map(s -> s._id)
-          .toList().toBlocking().first();
-
-      Intent intent = new Intent(ListStripsActivity.this, DetailStripActivity.class);
-      intent.putExtra(DetailStripActivity.STRIP, Parcels.wrap(model));
-      intent.putExtra(DetailStripActivity.IDS, listIds.toArray(new String[listIds.size()]));
-
-      startActivity(intent);
+      openDetailActivity(model);
     }
   });
 
   /**
+   * Starts the new activity with all the ids of this comics, but showing the page
+   * of the strip we pass as parameter
+   *
+   * @param strip comic strip that must be shown first on the detail activity
+   */
+  private void openDetailActivity(Strip strip) {
+    List<String> ids = Stream.of(listData)
+        .map(_strip -> _strip._id)
+        .collect(Collectors.toList());
+
+    String[] ids_array = ids.toArray(new String[ids.size()]);
+
+
+    Intent intent = new Intent(ListStripsActivity.this, DetailStripActivity.class);
+    intent.putExtra(DetailStripActivity.STRIP, Parcels.wrap(strip));
+    intent.putExtra(DetailStripActivity.IDS, ids_array);
+
+    startActivity(intent);
+  }
+
+  /**
    * Updates the list adapter with the new data available
    */
-  private void updateList() {
+  private void updateList(List<Strip> newData) {
+    this.listData = newData;
     listAdapter.setData(listData);
   }
 
@@ -147,7 +203,7 @@ public class ListStripsActivity extends AppCompatActivity {
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    Boolean isSubscribed = isComicPushNotificationSubscribed();
+    Boolean isSubscribed = subscribeUseCase.isSubscribed(getComicName());
 
     MenuItem togglePushNotification = menu.findItem(R.id.menu_push_notification);
 
@@ -163,27 +219,15 @@ public class ListStripsActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if(item.getItemId() == R.id.menu_push_notification) {
-      Boolean isSubscribed = isComicPushNotificationSubscribed();
-      Observable<Boolean> subscribe;
-      if(!isSubscribed) {
-        subscribe = repository.subscribe(getComicName());
-      } else {
-        subscribe = repository.unsubscribe(getComicName());
-      }
-
-      subscribe.subscribeOn(io())
+      subscribeUseCase.toogleSubscribe(getComicName())
           .observeOn(AndroidSchedulers.mainThread())
           .subscribe(
-              b -> {} ,
-              e -> Timber.e(LOGTAG, "Error during the request to the push notification"),
+              b -> Timber.d("toggle subscription on %s", getComicName()) ,
+              e -> Timber.e(e, "Error during the request to the push notification"),
               this::invalidateOptionsMenu);
     }
 
     return super.onOptionsItemSelected(item);
-  }
-
-  private Boolean isComicPushNotificationSubscribed() {
-    return repository.isSubscribed(getComicName()).toBlocking().first();
   }
 
   private String getComicName() {

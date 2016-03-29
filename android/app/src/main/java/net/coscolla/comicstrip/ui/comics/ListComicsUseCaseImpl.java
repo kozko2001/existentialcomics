@@ -28,7 +28,7 @@ public class ListComicsUseCaseImpl implements ListComicsUseCase {
    */
   @Override
   @RxLogObservable
-  public Observable<List<Comic>> getComicsObservable() {
+  public Observable<List<Comic>> observableModel() {
     return cache.listComics();
   }
 

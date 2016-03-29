@@ -28,10 +28,19 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
     this.urlBuilder = urlBuilder;
   }
 
+  /**
+   * Sets the callback so we can send which of the strips is the one the user has selected
+   * @param callback
+   */
   public void setCallback(AdapterCallback<Strip> callback) {
     this.callback = callback;
   }
 
+  /**
+   * Updates the current data of the recycle adapter, making all the recycle view to be updated
+   *
+   * @param data new data
+   */
   public void setData(List<Strip> data) {
     this.data = data;
     this.notifyDataSetChanged();

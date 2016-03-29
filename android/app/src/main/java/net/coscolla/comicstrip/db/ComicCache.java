@@ -18,6 +18,7 @@ package net.coscolla.comicstrip.db;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
@@ -47,6 +48,13 @@ public class ComicCache {
     storio = initializeDatabase(context);
   }
 
+  /**
+   * Initializes the storio library indicating which are the mapping for each type in the
+   * database and with each operation (insert, select, delete)
+   *
+   * @param context application context to access to the database
+   * @return StorIO configuration
+   */
   private DefaultStorIOSQLite initializeDatabase(Context context) {
     DatabaseOpenHelper db = new DatabaseOpenHelper(context);
     return DefaultStorIOSQLite.builder()
@@ -70,6 +78,7 @@ public class ComicCache {
    *
    * @return list of comics that are cached into the database
    */
+  @NonNull
   public Observable<List<Comic>> listComics() {
     return storio.get()
         .listOfObjects(Comic.class)
@@ -85,21 +94,45 @@ public class ComicCache {
    *
    * @param comics list of comics to be added to the cache
    */
-  public void insertComics(List<Comic> comics) {
+  public void insertComics(@NonNull  List<Comic> comics) {
       storio.put()
           .objects(comics)
           .prepare()
           .executeAsBlocking();
   }
 
+  /**
+   * Fetches the database for the current strips cached and maintain a subscription to notify when
+   * new data is inserted
+   *
+   * @param comic the comic to filter
+   * @return an observable of the database that triggers a list of all strips each time something
+   * changes in the datable that affect this comic
+   */
   @RxLogObservable
-  public Observable<List<Strip>> listStrips(String comic) {
+  @NonNull
+  public Observable<List<Strip>> listStrips(@NonNull  String comic) {
     return storio.get()
         .listOfObjects(Strip.class)
         .withQuery(cacheStripsSortedByOrderQuery(comic).build())
         .prepare()
         .asRxObservable();
   }
+
+  /**
+   * Insert a new list of strips
+   *
+   * If they are already inserted, just update them
+   *
+   * @param strips strip model list to be inserted
+   */
+  public void insertStrips(@NonNull List<Strip> strips) {
+    storio.put()
+        .objects(strips)
+        .prepare()
+        .executeAsBlocking();
+  }
+
 
   @NonNull
   private Query.CompleteBuilder cacheStripsSortedByOrderQuery(String comic) {
@@ -110,12 +143,14 @@ public class ComicCache {
         .orderBy(StripsTable.COLUMN_ORDER + " DESC");
   }
 
+
   /**
    * Obtains the most new id strip from the cache or null if cache is empty
    *
    * @param comic
    * @return
    */
+  @Nullable
   public String lastStripId(String comic) {
     Strip firstStrip = storio.get()
         .object(Strip.class)
@@ -130,12 +165,5 @@ public class ComicCache {
     } else {
       return null;
     }
-  }
-
-  public void insertStrips(List<Strip> strips) {
-    storio.put()
-        .objects(strips)
-        .prepare()
-        .executeAsBlocking();
   }
 }
