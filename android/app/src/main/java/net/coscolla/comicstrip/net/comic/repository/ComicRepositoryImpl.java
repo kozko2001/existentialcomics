@@ -62,23 +62,6 @@ public class ComicRepositoryImpl implements ComicRepository {
     return dbObservable;
   }
 
-  @Override
-  public Observable<Boolean> isSubscribed(String comic) {
-    return Observable.fromCallable(() -> pushManager.isSubscribed(comic));
-  }
-
-  @Override
-  public Observable<Boolean> subscribe(String comic) {
-    return pushManager.subscribe(comic)
-        .map(r -> true); // TODO: always is true on the backend
-  }
-
-  @Override
-  public Observable<Boolean> unsubscribe(String comic) {
-    return pushManager.unsubscribe(comic)
-        .map(r -> true);
-  }
-
   public Observable<List<Strip>> getStripsApi(String comic) {
     String lastId = cache.lastStripId(comic);
 
@@ -89,12 +72,6 @@ public class ComicRepositoryImpl implements ComicRepository {
     return api.listStrips(comic, lastId)
         .map(result -> result.result)
         .doOnNext(cache::insertStrips);
-  }
-
-  @RxLogObservable
-  private Observable<Comic> listComicsApi() {
-    return api.listComics()
-        .flatMap(result -> Observable.from(result.comics));
   }
 
 }

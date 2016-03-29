@@ -36,7 +36,6 @@ public class DetailStripActivity extends AppCompatActivity {
   public static final String STRIP = "strip";
   public static final String IDS = "IDS";
 
-  private Strip strip;
   private String[] strip_ids;
 
   @Bind(R.id.pager) ViewPager viewPager;
@@ -49,7 +48,7 @@ public class DetailStripActivity extends AppCompatActivity {
     setContentView(R.layout.activity_detail_strip);
     Graph.getInstance().getDetailStripComponent().inject(this);
 
-    getCurrentStrip(savedInstanceState);
+    strip_ids = getIntent().getStringArrayExtra(IDS);
 
     ButterKnife.bind(this);
 
@@ -59,7 +58,7 @@ public class DetailStripActivity extends AppCompatActivity {
   private void setupPageAdapter() {
     DetailStripPageAdapter adapter = new DetailStripPageAdapter(getSupportFragmentManager(), strip_ids);
     viewPager.setAdapter(adapter);
-    int index = findIndexForStripId(strip._id);
+    int index = findIndexForStripId(getCurrentStrip()._id);
     viewPager.setCurrentItem(index);
   }
 
@@ -72,29 +71,11 @@ public class DetailStripActivity extends AppCompatActivity {
     return 0;
   }
 
-  @Override
-  public void onSaveInstanceState(Bundle outState) {
-    outState.putParcelable(STRIP, Parcels.wrap(strip));
-    super.onSaveInstanceState(outState);
-  }
-
   /**
-   * Gets the strip
-   *
-   * If the activity is recreated get it from the savedInstance if not,
-   * get it from the intent bundle
-   *
-   * @param savedInstanceState
+   * Gets the first strip to be shown
    */
-  private void getCurrentStrip(@Nullable Bundle savedInstanceState) {
-    if(savedInstanceState != null) {
-      strip = Parcels.unwrap(savedInstanceState.getParcelable(STRIP));
-    } else {
-      strip = Parcels.unwrap(getIntent().getParcelableExtra(STRIP));
-    }
-
-    strip_ids = getIntent().getStringArrayExtra(IDS);
+  private Strip getCurrentStrip() {
+    return Parcels.unwrap(getIntent().getParcelableExtra(STRIP));
   }
-
 
 }

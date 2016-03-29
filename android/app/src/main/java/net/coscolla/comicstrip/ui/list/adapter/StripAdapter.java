@@ -15,17 +15,19 @@ import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.AdapterCallback;
+import net.coscolla.comicstrip.usecases.ListComicsUseCase;
+import net.coscolla.comicstrip.usecases.ListStripsUseCase;
 
 public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 
   public static final String SELECTED = "selected";
-  public final UrlBuilder urlBuilder;
+  private final ListStripsUseCase useCase;
 
   private List<Strip> data;
   private AdapterCallback<Strip> callback;
 
-  public StripAdapter(UrlBuilder urlBuilder) {
-    this.urlBuilder = urlBuilder;
+  public StripAdapter(ListStripsUseCase useCase) {
+    this.useCase = useCase;
   }
 
   /**
@@ -50,7 +52,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
   public StripViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext()).inflate(
         R.layout.list_item_strip, parent, false);
-    return new StripViewHolder(view, callback, urlBuilder);
+    return new StripViewHolder(view, callback, useCase);
   }
 
   @Override
@@ -72,18 +74,18 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
 class StripViewHolder extends RecyclerView.ViewHolder {
 
   private final ImageView imageView;
-  private final UrlBuilder urlBuilder;
+  private final ListStripsUseCase useCase;
   private TextView title;
   private Strip data;
   private AdapterCallback<Strip> callback;
 
-  public StripViewHolder (View itemView, AdapterCallback<Strip> callback, UrlBuilder urlBuilder) {
+  public StripViewHolder (View itemView, AdapterCallback<Strip> callback, ListStripsUseCase useCase) {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
     this.imageView = (ImageView) itemView.findViewById(R.id.preview);
     this.callback = callback;
-    this.urlBuilder = urlBuilder;
+    this.useCase = useCase;
 
     itemView.setOnClickListener(onRowSelected);
   }
@@ -92,7 +94,7 @@ class StripViewHolder extends RecyclerView.ViewHolder {
     this.data = strip;
     title.setText(strip.title);
 
-    String imageUrl = urlBuilder.urlThumbnail(strip);
+    String imageUrl = useCase.getPreviewUrl(strip);
 
     Glide.with(itemView.getContext())
         .load(imageUrl)

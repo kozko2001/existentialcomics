@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.net.api.ComicApi;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.usecases.ListStripsUseCase;
 import java.util.List;
 import rx.Observable;
@@ -15,10 +16,12 @@ public class ListStripsUseCaseImpl implements ListStripsUseCase {
 
   private final ComicCache cache;
   private final ComicApi api;
+  private final UrlBuilder urlBuilder;
 
-  public ListStripsUseCaseImpl(ComicCache cache, ComicApi api) {
+  public ListStripsUseCaseImpl(ComicCache cache, ComicApi api, UrlBuilder urlBuilder) {
     this.cache = cache;
     this.api = api;
+    this.urlBuilder = urlBuilder;
   }
 
   @Override
@@ -48,5 +51,13 @@ public class ListStripsUseCaseImpl implements ListStripsUseCase {
       lastId = "unknown";
     }
     return lastId;
+  }
+
+  /**
+   * @param strip strip entity
+   * @return url for the preview of this strip
+   */
+  public String getPreviewUrl(@NonNull Strip strip) {
+    return urlBuilder.urlThumbnail(strip);
   }
 }

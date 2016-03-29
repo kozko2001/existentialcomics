@@ -27,9 +27,4 @@ public interface ComicRepository {
 
   Observable<List<Strip>> getStrips(String comic);
 
-  Observable<Boolean> isSubscribed(String comic);
-
-  Observable<Boolean> subscribe(String comic);
-
-  Observable<Boolean> unsubscribe(String comic);
 }

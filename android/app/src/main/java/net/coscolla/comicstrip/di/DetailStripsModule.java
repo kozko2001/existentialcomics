@@ -16,9 +16,19 @@
 
 package net.coscolla.comicstrip.di;
 
+import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.net.api.UrlBuilder;
+import net.coscolla.comicstrip.ui.detail.DetailStripUseCaseImpl;
+import net.coscolla.comicstrip.usecases.DetailStripUseCase;
+
 import dagger.Module;
 import dagger.Provides;
 
 @Module
 public class DetailStripsModule {
+
+  @Provides
+  DetailStripUseCase providesUseCase(UrlBuilder urlBuilder, ComicCache cache) {
+    return new DetailStripUseCaseImpl(urlBuilder, cache);
+  }
 }

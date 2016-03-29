@@ -32,13 +32,13 @@ import dagger.Provides;
 @Module
 public class ListStripsModule {
   @Provides
-  public StripAdapter providesAdapter(UrlBuilder urlBuilder) {
-    return new StripAdapter(urlBuilder);
+  public StripAdapter providesAdapter(ListStripsUseCase useCase) {
+    return new StripAdapter(useCase);
   }
 
   @Provides
-  public ListStripsUseCase providesUseCase(ComicCache comicCache, ComicApi comicApi) {
-    return new ListStripsUseCaseImpl(comicCache, comicApi);
+  public ListStripsUseCase providesUseCase(ComicCache comicCache, ComicApi comicApi, UrlBuilder urlBuilder) {
+    return new ListStripsUseCaseImpl(comicCache, comicApi, urlBuilder);
   }
 
   @Provides

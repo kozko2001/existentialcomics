@@ -1,5 +1,7 @@
 package net.coscolla.comicstrip.usecases;
 
+import android.support.annotation.NonNull;
+
 import net.coscolla.comicstrip.entities.Strip;
 
 import java.util.List;
@@ -18,4 +20,12 @@ public interface ListStripsUseCase {
    * the model is updated and the observableModel is notified
    */
   Observable<List<Strip>> refresh(String comic);
+
+  /**
+   * Gets the url for the preview of the strip
+   *
+   * @param strip strip entity
+   * @return url to download a preview image of the strip
+   */
+  String getPreviewUrl(@NonNull Strip strip);
 }

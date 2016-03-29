@@ -37,7 +37,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
@@ -46,8 +45,6 @@ import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Strip;
-import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
-import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
 import net.coscolla.comicstrip.usecases.ListStripsUseCase;
@@ -67,8 +64,6 @@ public class ListStripsActivity extends AppCompatActivity {
   @Bind(R.id.main_content) CoordinatorLayout coordinatorLayout;
 
   private List<Strip> listData;
-
-  @Inject PushManager pushManager;
 
   @Inject StripAdapter listAdapter;
 

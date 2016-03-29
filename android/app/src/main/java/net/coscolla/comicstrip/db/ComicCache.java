@@ -133,7 +133,6 @@ public class ComicCache {
         .executeAsBlocking();
   }
 
-
   @NonNull
   private Query.CompleteBuilder cacheStripsSortedByOrderQuery(String comic) {
     return Query.builder()
@@ -147,8 +146,8 @@ public class ComicCache {
   /**
    * Obtains the most new id strip from the cache or null if cache is empty
    *
-   * @param comic
-   * @return
+   * @param comic name of the comic to find strips
+   * @return the id of the most recent strip stored in the cache or null if no strip is cached at all
    */
   @Nullable
   public String lastStripId(String comic) {
@@ -165,5 +164,24 @@ public class ComicCache {
     } else {
       return null;
     }
+  }
+
+  /**
+   * Returns the strip item already stored in the database in a form of a Observable
+   *
+   * @param id id of the strip we want to get from the database
+   * @return An observable with the strip or with a null inside
+   */
+  public Observable<Strip> getStripById(String id) {
+    return storio.get()
+        .object(Strip.class)
+        .withQuery(Query.builder()
+            .table(StripsTable.TABLE)
+            .where(StripsTable.COLUMN_ID + " = ? ")
+            .whereArgs(id)
+            .build()
+        ).prepare()
+        .asRxObservable()
+        .first();
   }
 }
