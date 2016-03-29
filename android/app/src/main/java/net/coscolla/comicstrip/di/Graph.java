@@ -52,6 +52,10 @@ public class Graph {
     return getAppComponent().plus(new ComicsModule(activity));
   }
 
+  public GcmMessageComponent getGcmComponent() {
+    return getAppComponent().plus(new GcmMessageModule());
+  }
+
   public void createAppComponent(Context appContext) {
     appComponent = DaggerAppComponent.builder()
         .appModule(new AppModule(appContext))

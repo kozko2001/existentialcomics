@@ -20,6 +20,7 @@ import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.push.PushManager;
+import net.coscolla.comicstrip.push.api.PushRestService;
 import net.coscolla.comicstrip.ui.list.ListStripsUseCaseImpl;
 import net.coscolla.comicstrip.ui.list.PushSubscribeUseCaseImpl;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
@@ -42,7 +43,7 @@ public class ListStripsModule {
   }
 
   @Provides
-  public PushSubscribeUseCase providesPushUseCase(PushManager pushManager) {
-    return new PushSubscribeUseCaseImpl(pushManager);
+  public PushSubscribeUseCase providesPushUseCase(PushManager pushManager, PushRestService restService) {
+    return new PushSubscribeUseCaseImpl(pushManager, restService);
   }
 }

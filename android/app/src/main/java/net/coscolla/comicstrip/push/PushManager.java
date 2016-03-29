@@ -35,6 +35,8 @@ import retrofit2.Response;
 import rx.Observable;
 import timber.log.Timber;
 
+import static rx.schedulers.Schedulers.io;
+
 public class PushManager {
 
   private static final String LOGTAG = "PushManager";
@@ -127,17 +129,11 @@ public class PushManager {
    * Pings the push server to maintain alive the notifications
    */
   private void ping() {
-    pushApi.ping(getUserId()).enqueue(new Callback<SubscribeResult>() {
-      @Override
-      public void onResponse(Call<SubscribeResult> call, Response<SubscribeResult> response) {
-        Timber.d("on ping request success");
-      }
-
-      @Override
-      public void onFailure(Call<SubscribeResult> call, Throwable t) {
-        Timber.e(t, "on ping request failed");
-      }
-    });
+    pushApi.ping(getUserId())
+        .subscribeOn(io())
+        .subscribe(
+            result -> Timber.d("on ping request success"),
+            e -> Timber.e(e, "on ping request failed"));
   }
 
   /**

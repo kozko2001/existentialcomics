@@ -11,8 +11,8 @@ import com.google.android.gms.gcm.GcmListenerService;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.net.comic.repository.ComicRepository;
 import net.coscolla.comicstrip.ui.list.ListStripsActivity;
+import net.coscolla.comicstrip.usecases.PushReceiveUseCase;
 
 import javax.inject.Inject;
 
@@ -23,26 +23,18 @@ import static rx.schedulers.Schedulers.io;
 public class GcmMessageHandler extends GcmListenerService {
   public static final int MESSAGE_NOTIFICATION_ID = 435345;
 
-  private static final String LOGTAG = "GcmMessageService";
-
-  @Inject ComicRepository repository;
+  @Inject PushReceiveUseCase useCase;
 
   @Override
   public void onMessageReceived(String from, Bundle data) {
-    String message = data.getString("message");
     String comic = data.getString("comic");
 
-    Graph.getInstance().getAppComponent().inject(this);
+    Graph.getInstance().getGcmComponent().inject(this);
 
-    repository.getStrips(comic)
-        .subscribeOn(io())
-        .subscribe(list -> {
-          createNotification(comic, comic, list.get(0).title);
-        }, (e) -> {
-          Timber.e(e, "GcmMessageService error fetching the data for comic " + comic);
-        }, () -> {
-
-        });
+    useCase.getLastStrip(comic)
+        .subscribe(
+            strip -> createNotification(comic, comic, strip.title),
+            e -> Timber.e(e, "Could not get the last strip from network"));
   }
 
   // Creates notification based on title and body received

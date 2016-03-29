@@ -11,39 +11,30 @@ import java.io.IOException;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.push.PushManager;
-import net.coscolla.comicstrip.push.api.PushRegisterRequestData;
-import net.coscolla.comicstrip.push.api.PushRegisterResponse;
-import net.coscolla.comicstrip.push.api.PushRestService;
+import net.coscolla.comicstrip.usecases.PushSubscribeUseCase;
 
 import javax.inject.Inject;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
+
+import static rx.schedulers.Schedulers.io;
 
 public class RegistrationIntentService extends IntentService {
 
-  private static final String LOGTAG = "RegistrationIntentServi";
-
-  @Inject PushManager pushManager;
-  @Inject PushRestService pushService;
+  @Inject PushSubscribeUseCase useCase;
 
   public RegistrationIntentService() {
-    super(LOGTAG);
+    super("RegistrationIntentServ");
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    Graph.getInstance().getAppComponent().inject(this);
-    pushManager.setUserId(null);
+    Graph.getInstance().getGcmComponent().inject(this);
 
     try {
       String token = getTokenId();
       sendRegistrationToServer(token);
     } catch (IOException e) {
-      Log.e(LOGTAG, "Registration service exception when registering the gcm token", e);
+      Timber.e(e, "Registration service exception when registering the gcm token");
     }
 
   }
@@ -64,24 +55,14 @@ public class RegistrationIntentService extends IntentService {
   /**
    * Use the push api to send the token and gets the user id
    *
-   * @param token
+   * @param token token from the {@link #getTokenId()}
    */
   private void sendRegistrationToServer(String token) {
-    PushRegisterRequestData data = new PushRegisterRequestData(token);
-    pushService.register(data).enqueue(new Callback<PushRegisterResponse>() {
-      @Override
-      public void onResponse(Call<PushRegisterResponse> call, Response<PushRegisterResponse> response) {
-        if(response.body() != null) {
-          String userId = response.body().id;
-          pushManager.setUserId(userId);
-        }
-      }
-
-      @Override
-      public void onFailure(Call<PushRegisterResponse> call, Throwable t) {
-        Timber.e(t, "Could not send the registration token to the server");
-      }
-
-    });
+    useCase.register(token)
+        .subscribeOn(io())
+        .subscribe(
+            response -> Timber.d("register response received: id %s", response.id),
+            e -> Timber.e(e, "register push notification request failed")
+        );
   }
 }

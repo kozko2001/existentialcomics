@@ -26,7 +26,7 @@ import rx.Observable;
 public interface PushRestService {
 
   @POST("/register")
-  Call<PushRegisterResponse> register(@Body PushRegisterRequestData request);
+  Observable<PushRegisterResponse> register(@Body PushRegisterRequestData request);
 
   @GET("/subscribe/{user_id}/{topic}")
   Observable<SubscribeResult> subscribe(@Path("user_id") String userId,
@@ -36,7 +36,7 @@ public interface PushRestService {
   Observable<SubscribeResult> unsubscribe(@Path("user_id") String userId);
 
   @GET("/ping/{user_id}")
-  Call<SubscribeResult> ping(@Path("user_id") String userId);
+  Observable<SubscribeResult> ping(@Path("user_id") String userId);
 
 
 }

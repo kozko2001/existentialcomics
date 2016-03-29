@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package net.coscolla.comicstrip.net.comic.repository;
+package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
+import android.content.Context;
 
-import java.util.List;
+import net.coscolla.comicstrip.net.api.ComicApi;
+import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.push.PushManager;
 
-import rx.Observable;
+import dagger.Module;
+import dagger.Provides;
 
-public interface ComicRepository {
+@Module
+public class DatabaseModule {
 
-  Observable<List<Strip>> getStrips(String comic);
+  @Provides
+  public ComicCache providesCache(Context appContext) {
+    return new ComicCache(appContext);
+  }
 
 }

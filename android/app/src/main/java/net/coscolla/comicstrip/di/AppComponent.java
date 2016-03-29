@@ -30,7 +30,7 @@ import dagger.Component;
         AppModule.class,
         ComicApiModule.class,
         PushModule.class,
-        RepositoryModule.class,
+        DatabaseModule.class,
         HttpClientModule.class
     }
 )
@@ -38,14 +38,12 @@ public interface AppComponent {
 
   void inject(App app);
 
-  void inject(RegistrationIntentService registrationIntentService);
-
-  void inject(GcmMessageHandler pushService);
-
   ListStripsComponent plus(ListStripsModule listStripsModule);
 
   DetailStripsComponent plus(DetailStripsModule detailStripsModule);
 
   ComicsActivityComponent plus(ComicsModule comicsModule);
+
+  GcmMessageComponent plus(GcmMessageModule module);
 }
 
