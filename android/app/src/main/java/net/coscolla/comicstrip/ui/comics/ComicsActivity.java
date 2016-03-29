@@ -27,7 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.google.common.collect.Lists;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
@@ -37,20 +38,17 @@ import net.coscolla.comicstrip.usecases.ListComicsUseCase;
 
 import org.parceler.Parcels;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
-import static rx.Observable.from;
-import static rx.Observable.zip;
+import static rx.schedulers.Schedulers.io;
 
 public class ComicsActivity extends AppCompatActivity {
 
@@ -102,10 +100,15 @@ public class ComicsActivity extends AppCompatActivity {
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    if(data != null && data.size() > 0){
-      List<Parcelable> storageData = Lists.transform(data, Parcels::wrap);
+    if(data != null && data.size() > 0) {
+      List<Parcelable> dataToStore = Stream.of(data)
+          .map(Parcels::wrap)
+          .collect(Collectors.toList());
 
-      outState.putParcelableArray(SAVED_INSTANCE_ARG_COMICS, storageData.toArray(new Parcelable[storageData.size()]));
+      Parcelable[] array = dataToStore.toArray(new Parcelable[dataToStore.size()]);
+
+
+      outState.putParcelableArray(SAVED_INSTANCE_ARG_COMICS, array);
     }
   }
 
@@ -117,8 +120,10 @@ public class ComicsActivity extends AppCompatActivity {
   private void restoreFromPreviousInstance(@NonNull  Bundle savedInstanceState) {
     Parcelable[] storageData = savedInstanceState.getParcelableArray(SAVED_INSTANCE_ARG_COMICS);
     if(storageData != null && storageData.length > 0) {
-      this.data = Lists.transform(Arrays.asList(storageData),
-          (d) -> Parcels.unwrap((Parcelable) d));
+
+      this.data = Stream.of(storageData)
+          .map(Parcels::<ComicAdapterModel>unwrap)
+          .collect(Collectors.toList());
     }
   }
 
@@ -135,7 +140,8 @@ public class ComicsActivity extends AppCompatActivity {
    * Launches a request to the repository and fills the adapter with the data
    */
   private void startListeningModel() {
-    subscription = useCase.getComicsObservable()
+    subscription = useCase.observableModel()
+        .subscribeOn(io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             this::onDataReceived,
@@ -148,7 +154,8 @@ public class ComicsActivity extends AppCompatActivity {
    */
   private void requestData() {
     useCase.refresh()
-        .subscribeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(io())
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             list -> Timber.d("New %d comics fetched ", list.size()),
             (e) -> {
@@ -174,28 +181,20 @@ public class ComicsActivity extends AppCompatActivity {
    * @param list data with the comic name from the api
    */
   private void onDataReceived(@NonNull  List<Comic> list) {
-    from(list)
-        .map(comic -> comic.name)
-        .toList()
-        .first()
-        .subscribe(_list -> {
-          this.data = convertToModel(_list);
-          updateAdapter();
-        });
+    this.data = Stream.of(list)
+        .map(this::convertToModel)
+        .collect(Collectors.toList());
+
+    updateAdapter();
   }
 
-  /**
+  /**s
    * Converts the raw comic api to the model for the adapter
-   * @param comics list of strings with the comics name
+   * @param comic list of strings with the comics name
    * @return list of ComicAdapterModel with the comic name
    */
-  private List<ComicAdapterModel> convertToModel(List<String> comics) {
-
-    return from(comics)
-        .map(ComicAdapterModel::new)
-        .toList()
-        .toBlocking()
-        .first();
+  private ComicAdapterModel convertToModel(Comic comic) {
+    return new ComicAdapterModel(comic.name);
   }
 
   /**
