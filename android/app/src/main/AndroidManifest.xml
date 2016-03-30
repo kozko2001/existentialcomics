@@ -59,6 +59,9 @@
 
         <meta-data android:name="endpoint" android:value="http://comic.allocsoc.net/" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="784e91d9c9e04ab0d09d29cfc3e82eed9e3e94ec" />
     </application>
 
 </manifest>

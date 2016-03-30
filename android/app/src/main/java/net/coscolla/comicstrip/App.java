@@ -2,8 +2,10 @@ package net.coscolla.comicstrip;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 
+import io.fabric.sdk.android.Fabric;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.push.PushManager;
 
@@ -18,6 +20,7 @@ public class App extends Application{
   @Override
   public void onCreate() {
     super.onCreate();
+    Fabric.with(this, new Crashlytics());
 
     Graph.getInstance().createAppComponent(this);
 
