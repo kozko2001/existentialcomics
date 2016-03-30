@@ -2,6 +2,8 @@ package net.coscolla.comicstrip;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
+
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.push.PushManager;
 
@@ -20,6 +22,9 @@ public class App extends Application{
     Graph.getInstance().createAppComponent(this);
 
     Graph.getInstance().getAppComponent().inject(this);
+
+    Stetho.initializeWithDefaults(this);
+
 
     setupLogging();
 

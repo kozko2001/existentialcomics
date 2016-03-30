@@ -1,5 +1,7 @@
 package net.coscolla.comicstrip.di;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import net.coscolla.comicstrip.BuildConfig;
 
 import dagger.Module;
@@ -17,6 +19,11 @@ public class HttpClientModule {
       interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
     }
 
-    return new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+
+    return new OkHttpClient.Builder()
+        .addInterceptor(interceptor)
+        .addNetworkInterceptor(new StethoInterceptor())
+        .build();
   }
 }
