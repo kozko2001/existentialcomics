@@ -1,6 +1,6 @@
 #!/bin/bash
 
-spiders=(existential xkcd dilbert)
+spiders=(existential xkcd dilbert commitstrip cynadine)
 
 for spider in ${spiders[*]}
 do
