@@ -126,9 +126,9 @@ def subscribe(user_id, topic):
     return jsonify({"result": "ok"})
 
 
-@app.route("/unsubscribe/<user_id>")
-def unsubscribe(user_id):
-    r = requests.delete("http://push:8081/subscriber/%s" % user_id)
+@app.route("/unsubscribe/<user_id>/<topic>")
+def unsubscribe(user_id, topic):
+    r = requests.delete("http://push:8081/subscriber/%s/subscriptions/%s" % (user_id, topic))
     print r
 
     return jsonify({"result": "ok"})

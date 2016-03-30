@@ -85,7 +85,7 @@ public class PushManager {
    * @return Observable with the results
    */
   public Observable<SubscribeResult> unsubscribe(@NonNull final String topic) {
-    return pushApi.unsubscribe(getUserId())
+    return pushApi.unsubscribe(getUserId(), topic)
         .doOnNext(result -> removeSubscribedTo(topic));
   }
 

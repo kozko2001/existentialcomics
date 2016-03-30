@@ -32,8 +32,9 @@ public interface PushRestService {
   Observable<SubscribeResult> subscribe(@Path("user_id") String userId,
                                         @Path("topic") String topic);
 
-  @GET("/unsubscribe/{user_id}")
-  Observable<SubscribeResult> unsubscribe(@Path("user_id") String userId);
+  @GET("/unsubscribe/{user_id}/{topic}")
+  Observable<SubscribeResult> unsubscribe(@Path("user_id") String userId,
+                                          @Path("topic") String topic);
 
   @GET("/ping/{user_id}")
   Observable<SubscribeResult> ping(@Path("user_id") String userId);
