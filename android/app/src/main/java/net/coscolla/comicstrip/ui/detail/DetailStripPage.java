@@ -27,8 +27,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.github.ybq.android.spinkit.style.FoldingCube;
+import com.github.ybq.android.spinkit.style.Pulse;
+import com.github.ybq.android.spinkit.style.Wave;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
@@ -59,6 +65,7 @@ public class DetailStripPage extends Fragment {
   private Strip strip;
 
   @Inject DetailStripUseCase useCase;
+  private Wave placeholder;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +82,8 @@ public class DetailStripPage extends Fragment {
     ButterKnife.bind(this, view);
 
     image = (ImageView) view.findViewById(R.id.image);
+
+    createLoadingDrawable();
 
     restoreStripFromSavedInstance(savedInstanceState);
 
@@ -179,16 +188,33 @@ public class DetailStripPage extends Fragment {
   private void loadImageFromNetwork(Strip strip) {
     final String imageUrl = useCase.getStripImageUrl(strip);
 
+
     Glide.with(this)
         .load(imageUrl)
         .asBitmap()
-        .into(new SimpleTarget<Bitmap>() {
+        .placeholder(placeholder)
+        .error(android.R.drawable.ic_menu_rotate)
+        .listener(new RequestListener<String, Bitmap>() {
           @Override
-          public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+          public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+            return false;
+          }
+
+          @Override
+          public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
             stripBitmap = resource;
             loadImageFromBitmap();
+            return false;
           }
-        });
+        })
+        .into(image);
+  }
+
+  private void createLoadingDrawable() {
+    placeholder = new Wave();
+    placeholder.setColor(0xFFFF4081);
+    placeholder.setScale(0.5f);
+    placeholder.start();
   }
 
   public static DetailStripPage newInstance(String id) {
