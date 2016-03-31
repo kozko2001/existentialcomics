@@ -17,7 +17,7 @@ class MongoPipeline(object):
         self.collection = self.db[settings['MONGODB_COLLECTION']]
 
     def process_item(self, item, spider):
-        title = item['title']
+        title = item['title'] or ""
         comic = item['comic']
         image = item['image']
         thumbnail = item['thumbnail']
@@ -28,7 +28,7 @@ class MongoPipeline(object):
 
         mongodb_item = self.collection.find_one({
             'comic': comic,
-            'title': title
+            'url': url
         })
 
         if not mongodb_item:

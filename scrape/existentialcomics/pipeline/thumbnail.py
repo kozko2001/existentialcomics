@@ -19,7 +19,7 @@ class ThumbnailPipeline(object):
         size = (image.width * p, image.height * p)
 
         image.thumbnail(size)
-        title = item['title'].encode('ascii', 'ignore')
+        title = item['title'] or item["order"]
 
         image_path = '%s/thumbnail_%s_%s.png' % (settings['IMAGES_STORE'], item['comic'], title)
         image.save(image_path, "JPEG", quality=90, optimize=True, progressive=True)

@@ -12,7 +12,8 @@ class CynadineSpider(BaseSpider):
     ]
 
     def parse(self, response):
-        if not self.existsInDatabase(response.url):
+        permalink = response.xpath("//input[@id='permalink']/@value").extract_first()
+        if not self.existsInDatabase(permalink):
             item = ExistentialcomicsItem()
 
             date = response.xpath("//*[contains(@class, 'meta-data')]/div/h3/a/text()").extract_first()
@@ -20,19 +21,19 @@ class CynadineSpider(BaseSpider):
             if date.year < 2014:
                 return
 
-            comic_id = int(response.xpath("//*[contains(@class, 'meta-data')]//@data-id").extract_first())
+            days_since_epoch = (date - datetime(1970, 1, 1)).days
 
             image_url = response.xpath("//img[@id='main-comic']/@src").extract_first()
             if not image_url:
                 image_url = response.xpath("//img[@id='featured-comic']/@src").extract_first()
 
             item['comic'] = 'cynadine'
-            item['title'] = str(comic_id)
+            item['title'] = ""
             item['image_urls'] = ["http:" + image_url]
             item['subtext'] = ""
-            item['url'] = response.url
+            item['url'] = permalink
             item['createdAt'] = date
-            item['order'] = comic_id
+            item['order'] = days_since_epoch
             yield item
 
             ## going to next page
