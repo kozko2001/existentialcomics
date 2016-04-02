@@ -27,13 +27,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
-import com.github.ybq.android.spinkit.style.FoldingCube;
-import com.github.ybq.android.spinkit.style.Pulse;
 import com.github.ybq.android.spinkit.style.Wave;
 
 import net.coscolla.comicstrip.R;
@@ -47,6 +42,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -58,14 +54,22 @@ public class DetailStripPage extends Fragment {
   private static final String SAVE_INSTANCE_STRIP = "STRIP";
 
   @Bind(R.id.image) ImageView image;
-
+  @Bind(R.id.error_container) View errorContainer;
+  @Inject DetailStripUseCase useCase;
   private String id;
   private Bitmap stripBitmap;
   private PhotoViewAttacher photoViewAttacher;
   private Strip strip;
+  private Wave loadingDrawable;
 
-  @Inject DetailStripUseCase useCase;
-  private Wave placeholder;
+  public static DetailStripPage newInstance(String id) {
+    DetailStripPage page = new DetailStripPage();
+    Bundle args = new Bundle();
+    args.putString(ID, id);
+    page.setArguments(args);
+
+    return page;
+  }
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -186,43 +190,75 @@ public class DetailStripPage extends Fragment {
    * @param strip strip entity
    */
   private void loadImageFromNetwork(Strip strip) {
-    final String imageUrl = useCase.getStripImageUrl(strip);
+    showLoading();
+    useCase.getImage(strip)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            this::loadImageFromBytes,
+            e -> {
+              Timber.e(e, "Error on getting the data for the strip image");
+              showRetry();
+            }
+        );
+  }
 
+  /**
+   * Shows the retry button for recover when socket timeout occurs
+   */
+  private void showRetry() {
+    errorContainer.setVisibility(View.VISIBLE);
+    image.setVisibility(View.GONE);
+  }
 
+  /**
+   * Shows the loading drawable in the image view of the comic
+   */
+  private void showLoading() {
+    errorContainer.setVisibility(View.GONE);
+    image.setVisibility(View.VISIBLE);
+    image.setImageDrawable(loadingDrawable);
+  }
+
+  /**
+   * Given the bytes from the network convert them to a bitmap using glide so we don't have
+   * to worry about cache and load into the image
+   *
+   * @param bytes data downloaded from the backedn
+   */
+  private void loadImageFromBytes(byte[] bytes) {
     Glide.with(this)
-        .load(imageUrl)
+        .load(bytes)
         .asBitmap()
-        .placeholder(placeholder)
-        .error(android.R.drawable.ic_menu_rotate)
-        .listener(new RequestListener<String, Bitmap>() {
+        .listener(new RequestListener<byte[], Bitmap>() {
           @Override
-          public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+          public boolean onException(Exception e, byte[] model, Target<Bitmap> target, boolean isFirstResource) {
             return false;
           }
 
           @Override
-          public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+          public boolean onResourceReady(Bitmap resource, byte[] model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
             stripBitmap = resource;
             loadImageFromBitmap();
             return false;
           }
         })
         .into(image);
+
+  }
+
+  /**
+   * Retry to download the image on the click of the retry button
+   */
+  @OnClick(R.id.btn_retry) void retry() {
+    if(strip != null) {
+      loadImageFromNetwork(strip);
+    }
   }
 
   private void createLoadingDrawable() {
-    placeholder = new Wave();
-    placeholder.setColor(0xFFFF4081);
-    placeholder.setScale(0.5f);
-    placeholder.start();
-  }
-
-  public static DetailStripPage newInstance(String id) {
-    DetailStripPage page = new DetailStripPage();
-    Bundle args = new Bundle();
-    args.putString(ID, id);
-    page.setArguments(args);
-
-    return page;
+    loadingDrawable = new Wave();
+    loadingDrawable.setColor(0xFFFF4081);
+    loadingDrawable.setScale(0.5f);
+    loadingDrawable.start();
   }
 }

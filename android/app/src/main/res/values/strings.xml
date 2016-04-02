@@ -4,4 +4,6 @@
     <string name="gcm_defaultSenderId">877459897703</string>
     <string name="subscribe">Subscribe</string>
     <string name="unsubscribe">Unsubscribe</string>
+    <string name="retry">Retry</string>
+    <string name="error_try_again">Could not download the image, please make sure you have connection and try again.</string>
 </resources>

@@ -23,12 +23,13 @@ import net.coscolla.comicstrip.usecases.DetailStripUseCase;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
 
 @Module
 public class DetailStripsModule {
 
   @Provides
-  DetailStripUseCase providesUseCase(UrlBuilder urlBuilder, ComicCache cache) {
-    return new DetailStripUseCaseImpl(urlBuilder, cache);
+  DetailStripUseCase providesUseCase(UrlBuilder urlBuilder, ComicCache cache, OkHttpClient httpClient) {
+    return new DetailStripUseCaseImpl(urlBuilder, cache, httpClient);
   }
 }

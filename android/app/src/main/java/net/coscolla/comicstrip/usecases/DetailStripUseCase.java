@@ -1,13 +1,16 @@
 package net.coscolla.comicstrip.usecases;
 
+import android.support.annotation.NonNull;
+
 import net.coscolla.comicstrip.entities.Strip;
 
 import rx.Observable;
-import rx.Single;
 
 public interface DetailStripUseCase {
 
-  String getStripImageUrl(Strip strip);
+  @NonNull
+  Observable<byte[]> getImage(@NonNull  Strip strip);
 
-  Observable<Strip> getStripById(String id);
+  @NonNull
+  Observable<Strip> getStripById(@NonNull  String id);
 }
