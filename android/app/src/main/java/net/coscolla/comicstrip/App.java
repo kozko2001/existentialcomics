@@ -4,13 +4,14 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
+import com.squareup.leakcanary.LeakCanary;
 
-import io.fabric.sdk.android.Fabric;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.push.PushManager;
 
 import javax.inject.Inject;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class App extends Application{
@@ -26,8 +27,9 @@ public class App extends Application{
 
     Graph.getInstance().getAppComponent().inject(this);
 
-    Stetho.initializeWithDefaults(this);
+    LeakCanary.install(this);
 
+    Stetho.initializeWithDefaults(this);
 
     setupLogging();
 
