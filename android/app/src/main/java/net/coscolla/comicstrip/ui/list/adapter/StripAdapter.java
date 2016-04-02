@@ -9,16 +9,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.List;
-
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.AdapterCallback;
-import net.coscolla.comicstrip.usecases.ListComicsUseCase;
 import net.coscolla.comicstrip.usecases.ListStripsUseCase;
 
-public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
+import java.util.List;
+
+public class StripAdapter extends RecyclerView.Adapter<StripAdapter.StripViewHolder>{
 
   public static final String SELECTED = "selected";
   private final ListStripsUseCase useCase;
@@ -69,46 +67,46 @@ public class StripAdapter extends RecyclerView.Adapter<StripViewHolder>{
       return data.size();
     }
   }
-}
 
-class StripViewHolder extends RecyclerView.ViewHolder {
+  public class StripViewHolder extends RecyclerView.ViewHolder {
 
-  private final ImageView imageView;
-  private final ListStripsUseCase useCase;
-  private TextView title;
-  private Strip data;
-  private AdapterCallback<Strip> callback;
-
-  public StripViewHolder (View itemView, AdapterCallback<Strip> callback, ListStripsUseCase useCase) {
-    super(itemView);
-
-    this.title = (TextView) itemView.findViewById(R.id.title);
-    this.imageView = (ImageView) itemView.findViewById(R.id.preview);
-    this.callback = callback;
-    this.useCase = useCase;
-
-    itemView.setOnClickListener(onRowSelected);
-  }
-
-  public void bind(Strip strip) {
-    this.data = strip;
-    title.setText(strip.title);
-
-    String imageUrl = useCase.getPreviewUrl(strip);
-
-    Glide.with(itemView.getContext())
-        .load(imageUrl)
-        .centerCrop()
-        .into(imageView);
-  }
-
-  private final View.OnClickListener onRowSelected = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      if(callback != null) {
-        callback.onEvent(StripAdapter.SELECTED, data);
+    private final ImageView imageView;
+    private final ListStripsUseCase useCase;
+    public Strip data;
+    private TextView title;
+    private AdapterCallback<Strip> callback;
+    private final View.OnClickListener onRowSelected = new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if(callback != null) {
+          callback.onEvent(StripAdapter.SELECTED, data);
+        }
       }
+    };
+
+    public StripViewHolder (View itemView, AdapterCallback<Strip> callback, ListStripsUseCase useCase) {
+      super(itemView);
+
+      this.title = (TextView) itemView.findViewById(R.id.title);
+      this.imageView = (ImageView) itemView.findViewById(R.id.preview);
+      this.callback = callback;
+      this.useCase = useCase;
+
+      itemView.setOnClickListener(onRowSelected);
     }
-  };
+
+    public void bind(Strip strip) {
+      this.data = strip;
+      title.setText(strip.title);
+
+      String imageUrl = useCase.getPreviewUrl(strip);
+
+      Glide.with(itemView.getContext())
+          .load(imageUrl)
+          .centerCrop()
+          .into(imageView);
+    }
+  }
 }
+
 

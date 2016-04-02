@@ -4,13 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-
     <!-- GCM -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <permission android:name="com.example.gcm.permission.C2D_MESSAGE"
+    <permission android:name="net.coscolla.comicstrip.permission.C2D_MESSAGE"
                 android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="net.coscolla.comicstrip.gcm.permission.C2D_MESSAGE" />
+
     <!-- END GCM -->
 
     <application

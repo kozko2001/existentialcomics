@@ -17,8 +17,7 @@
 package net.coscolla.comicstrip.di;
 
 import net.coscolla.comicstrip.App;
-import net.coscolla.comicstrip.push.gcm.GcmMessageHandler;
-import net.coscolla.comicstrip.push.gcm.RegistrationIntentService;
+import net.coscolla.comicstrip.net.api.ComicApi;
 
 import javax.inject.Singleton;
 
@@ -37,6 +36,8 @@ import dagger.Component;
 public interface AppComponent {
 
   void inject(App app);
+
+  ComicApi getComicApi();
 
   ListStripsComponent plus(ListStripsModule listStripsModule);
 

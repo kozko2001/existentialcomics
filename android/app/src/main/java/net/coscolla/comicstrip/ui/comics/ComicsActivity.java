@@ -44,8 +44,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 import static rx.schedulers.Schedulers.io;
@@ -67,7 +67,7 @@ public class ComicsActivity extends AppCompatActivity {
    */
   private List<ComicAdapterModel> data;
 
-  private Subscription subscription;
+  private CompositeSubscription subscription;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +83,14 @@ public class ComicsActivity extends AppCompatActivity {
 
     configureList();
 
+    subscription = new CompositeSubscription();
+
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+
     startListeningModel();
 
     if(data == null) {
@@ -90,6 +98,13 @@ public class ComicsActivity extends AppCompatActivity {
     } else {
       updateAdapter();
     }
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+
+    subscription.clear();
   }
 
   /**
@@ -130,22 +145,18 @@ public class ComicsActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-
-    if(subscription != null && !subscription.isUnsubscribed()) {
-      subscription.unsubscribe();
-    }
   }
 
   /**
    * Launches a request to the repository and fills the adapter with the data
    */
   private void startListeningModel() {
-    subscription = useCase.observableModel()
+    subscription.add(useCase.model()
         .subscribeOn(io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             this::onDataReceived,
-            (e) -> Timber.e(e, "Error downloading comics from the api"));
+            (e) -> Timber.e(e, "Error downloading comics from the api")));
   }
 
   /**
@@ -153,17 +164,19 @@ public class ComicsActivity extends AppCompatActivity {
    * will trigger and reload the data
    */
   private void requestData() {
-    useCase.refresh()
-        .subscribeOn(io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-            list -> Timber.d("New %d comics fetched ", list.size()),
-            (e) -> {
-              Timber.e(e, "Couldn't retrieve updated data");
-              showError("Couldn't retrieve updated data");
-            },
-            ()  -> Timber.d("request for comics completed")
-        );
+        subscription.add(useCase.refresh()
+            .subscribeOn(io())
+            .doOnNext(new_results -> Timber.d("New %d comics fetched ", new_results.size()))
+            .flatMap(new_results -> useCase.model())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                this::onDataReceived,
+                (e) -> {
+                  Timber.e(e, "Couldn't retrieve updated data");
+                  showError("Couldn't retrieve updated data");
+                },
+                ()  -> Timber.d("request for comics completed")
+            ));
   }
 
   /**

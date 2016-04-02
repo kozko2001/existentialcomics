@@ -25,8 +25,6 @@ import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
 import com.pushtorefresh.storio.sqlite.impl.DefaultStorIOSQLite;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
-import net.coscolla.comicstrip.entities.Comic;
-import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.db.resolvers.ComicDeleteResolver;
 import net.coscolla.comicstrip.db.resolvers.ComicGetResolver;
 import net.coscolla.comicstrip.db.resolvers.ComicPutResolver;
@@ -35,6 +33,8 @@ import net.coscolla.comicstrip.db.resolvers.StripPutResolver;
 import net.coscolla.comicstrip.db.resolvers.StripsDeleteResolver;
 import net.coscolla.comicstrip.db.tables.ComicsTable;
 import net.coscolla.comicstrip.db.tables.StripsTable;
+import net.coscolla.comicstrip.entities.Comic;
+import net.coscolla.comicstrip.entities.Strip;
 
 import java.util.List;
 
@@ -86,7 +86,8 @@ public class ComicCache {
             .table(ComicsTable.TABLE)
             .build())
         .prepare()
-        .asRxObservable();
+        .asRxObservable()
+        .first();
   }
 
   /**

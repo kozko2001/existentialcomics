@@ -27,6 +27,10 @@ public class Graph {
 
   private static Graph instance;
   private AppComponent appComponent;
+  private ListStripsComponent testListStripsComponent;
+  private DetailStripsComponent testDetailStripsComponent;
+  private ComicsActivityComponent testComicsComponent;
+  private GcmMessageComponent testGcmMessageComponent;
 
   public static Graph getInstance() {
     if(instance == null) {
@@ -40,26 +44,64 @@ public class Graph {
     return appComponent;
   }
 
+  public void setAppComponent(AppComponent appComponent) {
+    this.appComponent = appComponent;
+  }
+
   public ListStripsComponent getListStripsComponent() {
+    if(testListStripsComponent != null) {
+      return testListStripsComponent;
+    }
+
     return getAppComponent().plus(new ListStripsModule());
   }
 
   public DetailStripsComponent getDetailStripComponent() {
+    if(testDetailStripsComponent != null) {
+      return testDetailStripsComponent;
+    }
+
     return getAppComponent().plus(new DetailStripsModule());
   }
 
   public ComicsActivityComponent getComicsComponent(ComicsActivity activity) {
+    if(testComicsComponent != null) {
+      return testComicsComponent;
+    }
+
     return getAppComponent().plus(new ComicsModule(activity));
   }
 
   public GcmMessageComponent getGcmComponent() {
+    if(testGcmMessageComponent != null) {
+      return testGcmMessageComponent;
+    }
+
     return getAppComponent().plus(new GcmMessageModule());
   }
 
-  public void createAppComponent(Context appContext) {
-    appComponent = DaggerAppComponent.builder()
-        .appModule(new AppModule(appContext))
-        .build();
+  public DaggerAppComponent.Builder getAppComponentBuilder(Context appContext) {
+    return DaggerAppComponent.builder()
+        .appModule(new AppModule(appContext));
   }
 
+  public void createAppComponent(Context appContext) {
+    appComponent = getAppComponentBuilder(appContext).build();
+  }
+
+  public void setTestListStripsComponent(ListStripsComponent component) {
+    this.testListStripsComponent = component;
+  }
+
+  public void setTestDetailStripsComponent(DetailStripsComponent testDetailStripsComponent) {
+    this.testDetailStripsComponent = testDetailStripsComponent;
+  }
+
+  public void setTestComicsComponent(ComicsActivityComponent testComicsComponent) {
+    this.testComicsComponent = testComicsComponent;
+  }
+
+  public void setTestGcmMessageComponent(GcmMessageComponent testGcmMessageComponent) {
+    this.testGcmMessageComponent = testGcmMessageComponent;
+  }
 }

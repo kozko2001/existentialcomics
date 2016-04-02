@@ -24,11 +24,11 @@ public class ListComicsUseCaseImpl implements ListComicsUseCase {
   }
 
   /**
-   * @return an Observable that emits the status of the database each time it changes
+   * @return an Observable that emits the current status of the model
    */
   @Override
   @RxLogObservable
-  public Observable<List<Comic>> observableModel() {
+  public Observable<List<Comic>> model() {
     return cache.listComics();
   }
 

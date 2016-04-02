@@ -18,39 +18,38 @@ package net.coscolla.comicstrip.ui.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+
+import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.di.Graph;
+import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.ui.AdapterCallback;
+import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
+import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
+import net.coscolla.comicstrip.usecases.ListStripsUseCase;
+import net.coscolla.comicstrip.usecases.PushSubscribeUseCase;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
-
-import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
-import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.di.Graph;
-import net.coscolla.comicstrip.entities.Strip;
-import net.coscolla.comicstrip.ui.AdapterCallback;
-import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;
-import net.coscolla.comicstrip.usecases.ListStripsUseCase;
-import net.coscolla.comicstrip.usecases.PushSubscribeUseCase;
-
-import javax.inject.Inject;
 
 import static rx.schedulers.Schedulers.io;
 
@@ -62,16 +61,27 @@ public class ListStripsActivity extends AppCompatActivity {
   @Bind(R.id.list) RecyclerView list;
 
   @Bind(R.id.main_content) CoordinatorLayout coordinatorLayout;
-
-  private List<Strip> listData;
-
   @Inject StripAdapter listAdapter;
-
   @Inject ListStripsUseCase useCase;
-
   @Inject PushSubscribeUseCase subscribeUseCase;
-
+  private List<Strip> listData;
   private Subscription subscription;
+  /**
+   * Callback to receive which item of the list was selected
+   *
+   * Go to the strip image activity
+   */
+  private AdapterCallback<Strip> adapterCallback = ((eventName, model) -> {
+    if(eventName == StripAdapter.SELECTED) {
+      openDetailActivity(model);
+    }
+  });
+
+  public static Intent createIntent(Context context, String comicName) {
+    Intent intent = new Intent(context, ListStripsActivity.class);
+    intent.putExtra(INTENT_ARG_COMIC_NAME, comicName);
+    return intent;
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +116,7 @@ public class ListStripsActivity extends AppCompatActivity {
    * Starts observing the model and updates the list if there is new data
    */
   private void startListeningModel() {
-    subscription = useCase.observableModel(getComicName())
+    subscription = useCase.model(getComicName())
         .subscribeOn(io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
@@ -122,9 +132,11 @@ public class ListStripsActivity extends AppCompatActivity {
   private void request() {
     useCase.refresh(getComicName())
         .subscribeOn(io())
+        .doOnNext(list -> Timber.d("New %d comics fetched ", list.size()))
+        .flatMap(l -> useCase.model(getComicName()))
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
-            list -> Timber.d("new %d strips fetched from the network", list.size()),
+            this::updateList,
             e -> {
               Timber.e(e, "Couldn't get the new strips from the network");
               showError("Could'nt retrieve the updated data");
@@ -149,17 +161,6 @@ public class ListStripsActivity extends AppCompatActivity {
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
   }
-
-  /**
-   * Callback to receive which item of the list was selected
-   *
-   * Go to the strip image activity
-   */
-  private AdapterCallback<Strip> adapterCallback = ((eventName, model) -> {
-    if(eventName == StripAdapter.SELECTED) {
-      openDetailActivity(model);
-    }
-  });
 
   /**
    * Starts the new activity with all the ids of this comics, but showing the page
@@ -227,11 +228,5 @@ public class ListStripsActivity extends AppCompatActivity {
 
   private String getComicName() {
     return getIntent().getStringExtra(INTENT_ARG_COMIC_NAME);
-  }
-
-  public static Intent createIntent(Context context, String comicName) {
-    Intent intent = new Intent(context, ListStripsActivity.class);
-    intent.putExtra(INTENT_ARG_COMIC_NAME, comicName);
-    return intent;
   }
 }

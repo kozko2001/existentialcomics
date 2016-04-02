@@ -13,11 +13,11 @@ public interface ListStripsUseCase {
   /**
    * Observable that returns the current model when something changes about the strip entity
    */
-  Observable<List<Strip>> observableModel(String comic);
+  Observable<List<Strip>> model(String comic);
 
   /**
    * Observable to make a request and refresh the model from the network if new data is retrieved
-   * the model is updated and the observableModel is notified
+   * the model is updated and the model is notified
    */
   Observable<List<Strip>> refresh(String comic);
 

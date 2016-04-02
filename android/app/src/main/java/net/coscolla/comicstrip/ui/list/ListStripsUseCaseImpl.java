@@ -7,7 +7,9 @@ import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.usecases.ListStripsUseCase;
+
 import java.util.List;
+
 import rx.Observable;
 
 import static rx.schedulers.Schedulers.io;
@@ -25,7 +27,7 @@ public class ListStripsUseCaseImpl implements ListStripsUseCase {
   }
 
   @Override
-  public Observable<List<Strip>> observableModel(String comic) {
+  public Observable<List<Strip>> model(String comic) {
     return cache.listStrips(comic);
   }
 
