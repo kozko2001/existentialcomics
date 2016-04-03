@@ -17,6 +17,7 @@
 package net.coscolla.comicstrip.net.api;
 
 
+import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import rx.Observable;
@@ -27,4 +28,7 @@ public interface ComicApi {
 
   @GET("/comics/{comicname}/{last_id}")
   Observable<StripResults> listStrips(@Path("comicname") String comicName, @Path("last_id") String lastId);
+
+  @GET("/comics/image/{strip_id}")
+  Observable<ResponseBody> stripImage(@Path("strip_id") String stripId);
 }

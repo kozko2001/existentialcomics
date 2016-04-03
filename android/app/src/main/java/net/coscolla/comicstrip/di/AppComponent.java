@@ -30,7 +30,8 @@ import dagger.Component;
         ComicApiModule.class,
         PushModule.class,
         DatabaseModule.class,
-        HttpClientModule.class
+        HttpClientModule.class,
+        FsCacheModule.class
     }
 )
 public interface AppComponent {

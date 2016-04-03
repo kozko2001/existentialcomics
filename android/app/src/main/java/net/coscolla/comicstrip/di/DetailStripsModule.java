@@ -17,19 +17,19 @@
 package net.coscolla.comicstrip.di;
 
 import net.coscolla.comicstrip.db.ComicCache;
-import net.coscolla.comicstrip.net.api.UrlBuilder;
+import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.ui.detail.DetailStripUseCaseImpl;
 import net.coscolla.comicstrip.usecases.DetailStripUseCase;
+import net.coscolla.comicstrip.utils.RxFileUtils;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
 
 @Module
 public class DetailStripsModule {
 
   @Provides
-  DetailStripUseCase providesUseCase(UrlBuilder urlBuilder, ComicCache cache, OkHttpClient httpClient) {
-    return new DetailStripUseCaseImpl(urlBuilder, cache, httpClient);
+  DetailStripUseCase providesUseCase(ComicApi api, ComicCache cache, RxFileUtils fs) {
+    return new DetailStripUseCaseImpl(api, cache, fs);
   }
 }

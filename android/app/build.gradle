@@ -131,6 +131,8 @@ dependencies {
         transitive = true;
     }
     compile 'net.ypresto.timbertreeutils:timbertreeutils:1.0.0'
+    compile 'commons-io:commons-io:2.4'
+
 
     // canary leak
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'

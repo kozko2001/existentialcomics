@@ -4,56 +4,64 @@ import android.support.annotation.NonNull;
 
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.entities.Strip;
-import net.coscolla.comicstrip.net.api.UrlBuilder;
+import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.usecases.DetailStripUseCase;
+import net.coscolla.comicstrip.utils.RxFileUtils;
 
 import java.io.IOException;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import rx.Observable;
 import timber.log.Timber;
 
-import static rx.Observable.defer;
-import static rx.Observable.fromCallable;
+import static rx.Observable.error;
+import static rx.Observable.just;
 import static rx.schedulers.Schedulers.io;
 
 public class DetailStripUseCaseImpl implements DetailStripUseCase {
 
-  private final UrlBuilder urlBuilder;
-  private final ComicCache cache;
-  private final OkHttpClient httpClient;
+  private final ComicCache database;
+  private final ComicApi api;
+  private final RxFileUtils fs;
 
-  public DetailStripUseCaseImpl(UrlBuilder urlBuilder, ComicCache cache, OkHttpClient httpClient) {
-    this.urlBuilder = urlBuilder;
-    this.cache = cache;
-    this.httpClient = httpClient;
+  public DetailStripUseCaseImpl(ComicApi api, ComicCache database, RxFileUtils fs) {
+    this.api = api;
+    this.database = database;
+    this.fs = fs;
   }
 
   @Override
   public Observable<byte[]> getImage(@NonNull Strip strip) {
-      return  defer(() ->
-          fromCallable(() -> {
-            String url = urlBuilder.urlImage(strip._id);
 
-            Request request = new Request.Builder()
-                .url(url)
-                .build();
+    String key = strip._id;
 
-            try {
-              Response response = httpClient.newCall(request).execute();
-              return response.body().bytes();
-            } catch (IOException e) {
-              Timber.e(e, "Error fetching the strip image");
-              throw e;
-            }
-          }).subscribeOn(io()));
+    Observable<byte[]> networkRequest = api.stripImage(strip._id)
+        .subscribeOn(io())
+        .flatMap(responseBody -> {
+          try {
+            return just(responseBody.bytes());
+          } catch (IOException e) {
+            return error(e);
+          }
+        })
+        .doOnNext(data -> writeToCache(key, data));
+
+    Observable<byte[]> fsRequest = fs.readFile(key);
+
+    return fsRequest.switchIfEmpty(networkRequest);
+  }
+
+  private void writeToCache(String key, byte[] data) {
+    fs.writeFile(key, data)
+        .subscribeOn(io())
+        .subscribe(
+            (v) -> Timber.d("bytes inserted into fs cache for key %s", key),
+            (e) -> Timber.e("Could not write into cache for key %s", key)
+        );
   }
 
   @Override
   public Observable<Strip> getStripById(@NonNull String id) {
-    return cache.getStripById(id)
+    return database.getStripById(id)
         .subscribeOn(io());
   }
 }
