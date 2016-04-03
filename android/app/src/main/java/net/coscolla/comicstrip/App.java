@@ -8,6 +8,7 @@ import com.squareup.leakcanary.LeakCanary;
 
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.push.PushManager;
+import net.ypresto.timbertreeutils.CrashlyticsLogExceptionTree;
 
 import javax.inject.Inject;
 
@@ -37,7 +38,10 @@ public class App extends Application{
   }
 
   private void setupLogging() {
-    Timber.plant(new Timber.DebugTree());
+    if (BuildConfig.DEBUG) {
+      Timber.plant(new Timber.DebugTree());
+    }
+    Timber.plant(new CrashlyticsLogExceptionTree());
   }
 
   /***

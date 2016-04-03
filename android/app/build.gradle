@@ -130,7 +130,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-
+    compile 'net.ypresto.timbertreeutils:timbertreeutils:1.0.0'
 
     // canary leak
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
