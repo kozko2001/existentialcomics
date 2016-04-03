@@ -22,8 +22,9 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -158,8 +159,27 @@ public class ListStripsActivity extends AppCompatActivity {
    */
   private void configureList() {
     listAdapter.setCallback(this.adapterCallback);
-    list.setLayoutManager(new LinearLayoutManager(this));
+    list.setLayoutManager(createLayoutManager());
     list.setAdapter(listAdapter);
+  }
+
+  /**
+   * Configures the layout manager for the list, we are using a grid system that auto spans to
+   * get 300dp with cards
+   *
+   * @return a valid layout for the list
+   */
+  private RecyclerView.LayoutManager createLayoutManager() {
+    int totalWidth = this.getResources().getDisplayMetrics().widthPixels;
+    int columnWidth = (int) TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        300,
+        this.getResources().getDisplayMetrics());
+
+    int numColums = (int) Math.max(Math.floor(totalWidth / columnWidth), 1);
+    GridLayoutManager grid = new GridLayoutManager(this, numColums);
+
+    return grid;
   }
 
   /**
