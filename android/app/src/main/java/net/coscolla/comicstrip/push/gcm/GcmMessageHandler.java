@@ -18,8 +18,6 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static rx.schedulers.Schedulers.io;
-
 public class GcmMessageHandler extends GcmListenerService {
   public static final int MESSAGE_NOTIFICATION_ID = 435345;
 
@@ -37,14 +35,21 @@ public class GcmMessageHandler extends GcmListenerService {
             e -> Timber.e(e, "Could not get the last strip from network"));
   }
 
-  // Creates notification based on title and body received
+  /**
+   * Create a new notification announcing to the user a new strip is available
+   *
+   * @param comic String of the id of the comic
+   * @param title title of the notification
+   * @param body text of the notification
+   */
   private void createNotification(String comic, String title, String body) {
     Context context = getBaseContext();
 
     createIntent(comic);
 
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-        .setSmallIcon(R.mipmap.ic_launcher).setContentTitle(title)
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setContentTitle(title)
         .setContentText(body)
         .setContentIntent(createIntent(comic))
         .setAutoCancel(true);
@@ -52,7 +57,18 @@ public class GcmMessageHandler extends GcmListenerService {
     NotificationManager mNotificationManager = (NotificationManager) context
         .getSystemService(Context.NOTIFICATION_SERVICE);
 
-    mNotificationManager.notify(MESSAGE_NOTIFICATION_ID, mBuilder.build());
+    mNotificationManager.notify(getNotificationId(comic), mBuilder.build());
+  }
+
+  /**
+   * The notification id is a different for each comic, so we can have multiple notification
+   * one for each comic
+   *
+   * @param comic String that represent one comic
+   * @return a number that is the same for the same comic but different
+   */
+  private int getNotificationId(String comic) {
+    return MESSAGE_NOTIFICATION_ID + comic.hashCode();
   }
 
   private PendingIntent createIntent(String comic) {
