@@ -18,7 +18,6 @@ package net.coscolla.comicstrip.ui.detail;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -36,14 +35,13 @@ import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.usecases.DetailStripUseCase;
 
-import org.parceler.Parcels;
-
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -51,11 +49,11 @@ public class DetailStripPage extends Fragment {
 
   public static final String BITMAP = "bitmap";
   private static final String ID = "ID";
-  private static final String SAVE_INSTANCE_STRIP = "STRIP";
 
   @Bind(R.id.image) ImageView image;
   @Bind(R.id.error_container) View errorContainer;
   @Inject DetailStripUseCase useCase;
+  CompositeSubscription subscription;
   private String id;
   private Bitmap stripBitmap;
   private PhotoViewAttacher photoViewAttacher;
@@ -76,7 +74,6 @@ public class DetailStripPage extends Fragment {
     super.onCreate(savedInstanceState);
     Graph.getInstance().getDetailStripComponent().inject(this);
 
-    id = getArguments().getString(ID);
   }
 
   @Nullable
@@ -84,61 +81,54 @@ public class DetailStripPage extends Fragment {
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.activity_detail_strip_page, container, false);
     ButterKnife.bind(this, view);
-
-    image = (ImageView) view.findViewById(R.id.image);
-
     createLoadingDrawable();
 
-    restoreStripFromSavedInstance(savedInstanceState);
+    subscription = new CompositeSubscription();
+    id = getArguments().getString(ID);
+    strip = useCase.getStripById(id).toBlocking().first();
 
-    loadImageFromSavedInstanceOrNetwork(savedInstanceState);
+    loadImageFromSavedInstance(savedInstanceState);
 
     return view;
   }
 
-  /**
-   * Gets the strip comic object from the savedInstanceState
-   *
-   * if cannot get from the savedInstance like if is the first time for this fragment, we as
-   * the database for the strip object
-   *
-   * @param savedInstanceState
-   */
-  private void restoreStripFromSavedInstance(@Nullable Bundle savedInstanceState) {
-    if(savedInstanceState != null) {
-      Parcelable stripParcel = savedInstanceState.getParcelable(SAVE_INSTANCE_STRIP);
-      if(stripParcel != null) {
-        this.strip = Parcels.<Strip>unwrap(stripParcel);
-      }
+  @Override
+  public void onResume() {
+    super.onResume();
+
+
+    Timber.i("onResume of %s", strip.title);
+    if(stripBitmap != null) {
+      loadImageFromBitmap();
+    } else {
+      loadImageFromNetwork(strip);
     }
 
-    // if could not restore from the savedInstance request to the database
-    if(this.strip == null) {
-      useCase.getStripById(id).subscribe(
-          strip -> this.strip = strip,
-          e -> Timber.e(e, "could not get from the cache the strip with id %s", id),
-          () -> Timber.d("Completed the strip by id")
-      );
-    }
+  }
+
+  @Override
+  public void onPause() {
+    super.onStop();
+
+    subscription.clear();
+
+    Timber.i("onPause of %s", strip.title);
   }
 
   /**
-   * Tries to reload the image from the savedInstance if not possible makes a request to
-   * the network
+   * Stores in the savedInstance the bitmap already loaded
    *
-   * @param savedInstanceState
+   * @param outState bundle where we store information to be pass when restoring the view
    */
-  private void loadImageFromSavedInstanceOrNetwork(@Nullable Bundle savedInstanceState) {
-    loadImageFromSavedInstance(savedInstanceState);
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    Timber.i("onSaveInstance of %s", strip.title);
 
-    if(stripBitmap == null) {
-      useCase.getStripById(id)
-          .observeOn(AndroidSchedulers.mainThread())
-          .subscribe(
-              this::loadImageFromNetwork,
-              e -> Timber.e(e, "could not get from the cache the strip with id %s", id)
-          );
+    if(stripBitmap != null) {
+      outState.putParcelable(BITMAP, stripBitmap);
     }
+
+    super.onSaveInstanceState(outState);
   }
 
   /**
@@ -148,7 +138,6 @@ public class DetailStripPage extends Fragment {
   private void loadImageFromSavedInstance(Bundle savedInstanceState) {
     if(savedInstanceState != null && savedInstanceState.containsKey(BITMAP)) {
       stripBitmap = savedInstanceState.getParcelable(BITMAP);
-      loadImageFromBitmap();
     }
   }
 
@@ -156,6 +145,8 @@ public class DetailStripPage extends Fragment {
    * Loads the strip bitmap inside the image view and configures the photoView library
    */
   private void loadImageFromBitmap() {
+    image.setVisibility(View.VISIBLE);
+    errorContainer.setVisibility((View.GONE));
     image.setImageBitmap(stripBitmap);
 
     if(photoViewAttacher == null ) {
@@ -167,31 +158,13 @@ public class DetailStripPage extends Fragment {
   }
 
   /**
-   * Stores in the savedInstance the bitmap already loaded and the current strip we are showing
-   *
-   * @param outState bundle where we store information to be pass when restoring the view
-   */
-  @Override
-  public void onSaveInstanceState(Bundle outState) {
-    if(stripBitmap != null) {
-      outState.putParcelable(BITMAP, stripBitmap);
-    }
-
-    if(strip != null) {
-      outState.putParcelable(SAVE_INSTANCE_STRIP, Parcels.wrap(strip));
-    }
-
-    super.onSaveInstanceState(outState);
-  }
-
-  /**
    * Makes a network call to get the bitmap and loads it into the imageview
    *
    * @param strip strip entity
    */
   private void loadImageFromNetwork(Strip strip) {
     showLoading();
-    useCase.getImage(strip)
+    subscription.add(useCase.getImage(strip)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             this::loadImageFromBytes,
@@ -199,7 +172,7 @@ public class DetailStripPage extends Fragment {
               Timber.e(e, "Error on getting the data for the strip image");
               showRetry();
             }
-        );
+        ));
   }
 
   /**
@@ -243,7 +216,6 @@ public class DetailStripPage extends Fragment {
           }
         })
         .into(image);
-
   }
 
   /**

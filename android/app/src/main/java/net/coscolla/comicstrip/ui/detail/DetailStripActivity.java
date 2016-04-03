@@ -16,50 +16,90 @@
 
 package net.coscolla.comicstrip.ui.detail;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import org.parceler.Parcels;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.detail.adapter.DetailStripPageAdapter;
+import net.coscolla.comicstrip.usecases.DetailStripUseCase;
+
+import org.parceler.Parcels;
+
+import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import rx.android.schedulers.AndroidSchedulers;
+import timber.log.Timber;
 
 
 public class DetailStripActivity extends AppCompatActivity {
 
   public static final String STRIP = "strip";
   public static final String IDS = "IDS";
-
-  private String[] strip_ids;
-
   @Bind(R.id.pager) ViewPager viewPager;
-
+  @Inject DetailStripUseCase useCase;
+  private String[] strip_ids;
+  private Strip currentStrip;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.activity_detail_strip);
+    ButterKnife.bind(this);
     Graph.getInstance().getDetailStripComponent().inject(this);
 
+    onRestoreSavedState(savedInstanceState);
     strip_ids = getIntent().getStringArrayExtra(IDS);
 
-    ButterKnife.bind(this);
-
     setupPageAdapter();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+
+    if(currentStrip != null) {
+      outState.putParcelable(STRIP, Parcels.wrap(currentStrip));
+    }
+  }
+
+  protected void onRestoreSavedState(Bundle savedInstanceState) {
+    if(savedInstanceState != null && savedInstanceState.containsKey(STRIP)) {
+      setCurrentStrip(Parcels.unwrap(savedInstanceState.getParcelable(STRIP)));
+    }
+    else if(savedInstanceState == null) {
+      Strip strip = Parcels.unwrap(getIntent().getParcelableExtra(STRIP));
+      setCurrentStrip(strip);
+    }
   }
 
   private void setupPageAdapter() {
     DetailStripPageAdapter adapter = new DetailStripPageAdapter(getSupportFragmentManager(), strip_ids);
     viewPager.setAdapter(adapter);
-    int index = findIndexForStripId(getCurrentStrip()._id);
+    int index = findIndexForStripId(currentStrip._id);
     viewPager.setCurrentItem(index);
+    viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+      @Override
+      public void onPageSelected(int position) {
+        String id = strip_ids[position];
+        useCase.getStripById(id)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                strip -> setCurrentStrip(strip),
+                e -> Timber.e(e, "Something went wrong when getting the %s strip", id));
+      }
+    });
   }
 
   private int findIndexForStripId(String id) {
@@ -71,11 +111,29 @@ public class DetailStripActivity extends AppCompatActivity {
     return 0;
   }
 
-  /**
-   * Gets the first strip to be shown
-   */
-  private Strip getCurrentStrip() {
-    return Parcels.unwrap(getIntent().getParcelableExtra(STRIP));
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.detail_strip_menu, menu);
+    return true;
   }
 
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if(item.getItemId() == R.id.open_browser) {
+      Uri url = Uri.parse(currentStrip.url);
+
+      if(url != null) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, url);
+        startActivity(browserIntent);
+      }
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  public void setCurrentStrip(@NonNull Strip currentStrip) {
+    this.currentStrip = currentStrip;
+    setTitle(currentStrip.title);
+  }
 }

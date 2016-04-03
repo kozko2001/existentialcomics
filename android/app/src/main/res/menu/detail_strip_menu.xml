@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:compat="http://schemas.android.com/apk/res-auto">
+
+        <item android:id="@+id/open_browser"
+              android:icon="@mipmap/ic_explore_white_36dp"
+              android:title="@string/open_browser"
+              compat:showAsAction="always"
+            />
+</menu>

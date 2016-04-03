@@ -139,13 +139,11 @@ dependencies {
 }
 
 mdicons {
-    defcolor 'mycolor', '#9804d9'
-
     assets {
         icons {
-            colors "mycolor", "white"
+            colors "white"
             sizes  "36dp"
-            names  "favorite", "favorite_border"
+            names  "favorite", "favorite_border", "explore"
         }
 
     }

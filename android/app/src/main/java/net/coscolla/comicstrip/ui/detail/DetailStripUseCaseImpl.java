@@ -15,6 +15,8 @@ import okhttp3.Response;
 import rx.Observable;
 import timber.log.Timber;
 
+import static rx.Observable.defer;
+import static rx.Observable.fromCallable;
 import static rx.schedulers.Schedulers.io;
 
 public class DetailStripUseCaseImpl implements DetailStripUseCase {
@@ -31,21 +33,22 @@ public class DetailStripUseCaseImpl implements DetailStripUseCase {
 
   @Override
   public Observable<byte[]> getImage(@NonNull Strip strip) {
-      return  Observable.fromCallable(() -> {
-        String url = urlBuilder.urlImage(strip._id);
+      return  defer(() ->
+          fromCallable(() -> {
+            String url = urlBuilder.urlImage(strip._id);
 
-        Request request = new Request.Builder()
-            .url(url)
-            .build();
+            Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-        try {
-          Response response = httpClient.newCall(request).execute();
-          return response.body().bytes();
-        } catch (IOException e) {
-          Timber.e(e, "Error fetching the strip image");
-          throw e;
-        }
-      }).subscribeOn(io());
+            try {
+              Response response = httpClient.newCall(request).execute();
+              return response.body().bytes();
+            } catch (IOException e) {
+              Timber.e(e, "Error fetching the strip image");
+              throw e;
+            }
+          }).subscribeOn(io()));
   }
 
   @Override
