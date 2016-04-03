@@ -1,0 +1,37 @@
+* ComicStrip
+** Before release 1.0
+*** TODO Bug strip image
+
+ Strange bug that shows the image from another strip in the detail of the other.
+
+ Seems to be related to the fragment lifecycle and the Observable return a image to
+ a fragment that have changed the argument
+
+*** TODO better selection of the comics 
+
+ Make the first screen be more atractive to new users
+
+  - [ ] Change backend so the comics requests returns more information
+    - [ ] Return title of each comic
+    - [ ] Return last strip entity
+
+*** TODO Some analytics to know the users which comic are more subscribed and more used
+  - [ ] See if we can use the fabrics answer analytics supports all the features
+
+*** TODO Release v 1.0
+  - [ ] Make the screenshots
+  - [ ] Do the last final tests
+  - [ ] Make the release to the play store 
+
+** Roadmap   
+
+*** TODO Tablet layout
+*** TODO Create a timeline to see all new strips with filtering for 
+*** TODO Make a survey to now which strips are more demanded
+    - [ ] Create on the comics list a final element that ask if the comic is not there and redirects to a survey
+    - [ ] Create survey
+      - [ ] For new features
+      - [ ] For new comics 
+*** TODO Create a favorites strips
+*** TODO Improve notification with a preview of the new strips
+    
