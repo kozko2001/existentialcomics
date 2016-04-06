@@ -18,6 +18,7 @@ package net.coscolla.comicstrip.di;
 
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.net.api.ComicApi;
+import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.ui.comics.ComicAdapter;
 import net.coscolla.comicstrip.ui.comics.ComicsActivity;
 import net.coscolla.comicstrip.ui.comics.ListComicsUseCaseImpl;
@@ -46,7 +47,7 @@ public class ComicsModule {
   }
 
   @Provides
-  public ListComicsUseCase providesUseCase(ComicCache cache, ComicApi api) {
-    return new ListComicsUseCaseImpl(cache, api);
+  public ListComicsUseCase providesUseCase(ComicCache cache, ComicApi api, PushManager pushManager) {
+    return new ListComicsUseCaseImpl(cache, api, pushManager);
   }
 }

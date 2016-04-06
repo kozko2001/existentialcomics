@@ -1,6 +1,7 @@
 package net.coscolla.comicstrip.push.gcm;
 
 import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.usecases.PushReceiveUseCase;
@@ -31,5 +32,13 @@ public class PushReceiveUseCaseImpl implements PushReceiveUseCase {
         .subscribeOn(io())
         .flatMap(result -> from(result.result))
         .first();
+  }
+
+  @Override
+  public Observable<Comic> getComic(String comicId) {
+    return cache.listComics()
+        .flatMap(Observable::from)
+        .filter(c -> comicId.equals(c.comic_id))
+        .single();
   }
 }
