@@ -1,5 +1,6 @@
 package net.coscolla.comicstrip.ui.list;
 
+import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.push.api.PushRegisterRequestData;
 import net.coscolla.comicstrip.push.api.PushRegisterResponse;
@@ -14,17 +15,20 @@ public class PushSubscribeUseCaseImpl implements PushSubscribeUseCase {
 
   private final PushManager pushManager;
   private final PushRestService api;
+  private final IAnalytics analytics;
 
-  public PushSubscribeUseCaseImpl(PushManager pushManager, PushRestService api) {
+  public PushSubscribeUseCaseImpl(PushManager pushManager, PushRestService api, IAnalytics analytics) {
     this.pushManager = pushManager;
     this.api = api;
+    this.analytics = analytics;
   }
 
   @Override
   public Observable<Boolean> subscribe(String topic) {
     return pushManager.subscribe(topic)
         .subscribeOn(io())
-        .map(r -> true);
+        .map(r -> true)
+        .doOnNext(t -> analytics.eventComicSubscribed(topic));
   }
 
   @Override

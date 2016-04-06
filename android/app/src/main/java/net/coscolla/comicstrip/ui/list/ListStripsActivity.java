@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +33,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
 import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
@@ -61,6 +61,8 @@ import static rx.schedulers.Schedulers.io;
 public class ListStripsActivity extends AppCompatActivity {
 
   public static final String INTENT_ARG_COMIC = "comic";
+  public static final String INTENT_ARG_FROM_NOTIFICATION = "fromNotification";
+  public static final String INTENT_ARG_FROM_NOTIFICATION_STRIP = "fromNotificationStrip";
 
   @Bind(R.id.list) RecyclerView list;
 
@@ -68,6 +70,7 @@ public class ListStripsActivity extends AppCompatActivity {
   @Inject StripAdapter listAdapter;
   @Inject ListStripsUseCase useCase;
   @Inject PushSubscribeUseCase subscribeUseCase;
+  @Inject IAnalytics analytics;
 
   private List<Strip> listData;
   private Subscription subscription;
@@ -84,6 +87,13 @@ public class ListStripsActivity extends AppCompatActivity {
       openDetailActivity(model);
     }
   });
+
+  public static Intent createIntent(Context context, Comic comic) {
+    Intent intent = new Intent(context, ListStripsActivity.class);
+    intent.putExtra(INTENT_ARG_COMIC, Parcels.wrap(comic));
+    return intent;
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -93,6 +103,8 @@ public class ListStripsActivity extends AppCompatActivity {
     setTitle(getComic().name);
 
     ButterKnife.bind(this);
+
+    sendAnalyticsEvents();
 
     configureList();
 
@@ -176,9 +188,8 @@ public class ListStripsActivity extends AppCompatActivity {
         this.getResources().getDisplayMetrics());
 
     int numColums = (int) Math.max(Math.floor(totalWidth / columnWidth), 1);
-    GridLayoutManager grid = new GridLayoutManager(this, numColums);
 
-    return grid;
+    return new GridLayoutManager(this, numColums);
   }
 
   /**
@@ -253,6 +264,19 @@ public class ListStripsActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  /**
+   * Sends some analytics event to know what is the user doing and using most
+   */
+  private void sendAnalyticsEvents() {
+    analytics.eventStripListViewed(getComic().comic_id);
+    if (getIntent().getBooleanExtra(INTENT_ARG_FROM_NOTIFICATION, false)) {
+      Strip strip = Parcels.unwrap(getIntent().getParcelableExtra(INTENT_ARG_FROM_NOTIFICATION_STRIP));
+      if(strip != null) {
+        analytics.eventNotificationOpened(getComic().comic_id, strip);
+      }
+    }
+  }
+
   private Comic getComic() {
     if(comic == null) {
       comic = Parcels.unwrap(getIntent().getParcelableExtra("comic"));
@@ -262,12 +286,6 @@ public class ListStripsActivity extends AppCompatActivity {
 
   private String getComicId() {
     return getComic().comic_id;
-  }
-
-  public static Intent createIntent(Context context, Comic comic) {
-    Intent intent = new Intent(context, ListStripsActivity.class);
-    intent.putExtra(INTENT_ARG_COMIC, Parcels.wrap(comic));
-    return intent;
   }
 
 }

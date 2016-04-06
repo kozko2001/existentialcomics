@@ -16,6 +16,7 @@
 
 package net.coscolla.comicstrip.di;
 
+import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.net.api.UrlBuilder;
@@ -43,7 +44,8 @@ public class ListStripsModule {
   }
 
   @Provides
-  public PushSubscribeUseCase providesPushUseCase(PushManager pushManager, PushRestService restService) {
-    return new PushSubscribeUseCaseImpl(pushManager, restService);
+  public PushSubscribeUseCase providesPushUseCase(PushManager pushManager,
+                                                  PushRestService restService, IAnalytics analytics) {
+    return new PushSubscribeUseCaseImpl(pushManager, restService, analytics);
   }
 }

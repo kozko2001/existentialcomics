@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import net.coscolla.comicstrip.R;
+import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.detail.adapter.DetailStripPageAdapter;
@@ -47,7 +48,10 @@ public class DetailStripActivity extends AppCompatActivity {
   public static final String STRIP = "strip";
   public static final String IDS = "IDS";
   @Bind(R.id.pager) ViewPager viewPager;
+
   @Inject DetailStripUseCase useCase;
+  @Inject IAnalytics analytics;
+
   private String[] strip_ids;
   private Strip currentStrip;
 
@@ -135,5 +139,6 @@ public class DetailStripActivity extends AppCompatActivity {
   public void setCurrentStrip(@NonNull Strip currentStrip) {
     this.currentStrip = currentStrip;
     setTitle(currentStrip.title);
+    analytics.eventStripViewed(currentStrip);
   }
 }

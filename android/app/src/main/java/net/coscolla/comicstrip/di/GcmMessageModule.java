@@ -1,5 +1,6 @@
 package net.coscolla.comicstrip.di;
 
+import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.push.PushManager;
@@ -21,7 +22,8 @@ public class GcmMessageModule {
   }
 
   @Provides
-  public PushSubscribeUseCase providesSubscribeUseCase(PushManager pushManager, PushRestService api) {
-    return new PushSubscribeUseCaseImpl(pushManager, api);
+  public PushSubscribeUseCase providesSubscribeUseCase(PushManager pushManager,
+                                                       PushRestService api, IAnalytics analytics) {
+    return new PushSubscribeUseCaseImpl(pushManager, api, analytics);
   }
 }

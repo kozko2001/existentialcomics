@@ -31,7 +31,8 @@ import dagger.Component;
         PushModule.class,
         DatabaseModule.class,
         HttpClientModule.class,
-        FsCacheModule.class
+        FsCacheModule.class,
+        AnalyticsModule.class
     }
 )
 public interface AppComponent {
