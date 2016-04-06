@@ -2,38 +2,44 @@
 ** Before release 1.0
 *** TODO Bug strip image
 
- Strange bug that shows the image from another strip in the detail of the other.
+Strange bug that shows the image from another strip in the detail of the other.
 
- Seems to be related to the fragment lifecycle and the Observable return a image to
- a fragment that have changed the argument
+Seems to be related to the fragment lifecycle and the Observable return a image to
+a fragment that have changed the argument
 
-*** TODO better selection of the comics 
+*** DONE better selection of the comics  
+<2016-04-03 Sun>
+Make the first screen be more atractive to new users
 
- Make the first screen be more atractive to new users
+- [X] Change backend so the comics requests returns more information
+  - [X] Return title of each comic
+  - [X] Sort by fav / non fav (app side)
 
-  - [X] Change backend so the comics requests returns more information
-    - [X] Return title of each comic
-    - [X] Sort by fav / non fav (app side)
+*** DONE Some analytics to know the users which comic are more subscribed and more used
+<2016-04-03 Sun>
+- [X] See if we can use the fabrics answer analytics supports all the features
 
-*** TODO Some analytics to know the users which comic are more subscribed and more used
-  - [ ] See if we can use the fabrics answer analytics supports all the features
+*** TODO Share capabilities of strip
+<2016-04-03 Sun>
+- [ ] Create a new share icon while vieweing a strip
+- [ ] Test sharing with whatsapp, twitter, facebook
 
 *** TODO Release v 1.0
-  - [ ] Make the screenshots
-  - [ ] Do the last final tests
-  - [ ] Make the release to the play store 
+- [ ] Make the screenshots
+- [ ] Do the last final tests
+- [ ] Make the release to the play store 
 
 ** Roadmap   
 * Create in the 
 *** TODO Shown last strip in the comic menu
-    - [ ] Return last strip entity
+- [ ] Return last strip entity
 *** TODO Tablet layout
 *** TODO Create a timeline to see all new strips with filtering for 
 *** TODO Make a survey to now which strips are more demanded
-    - [ ] Create on the comics list a final element that ask if the comic is not there and redirects to a survey
-    - [ ] Create survey
-      - [ ] For new features
-      - [ ] For new comics 
+- [ ] Create on the comics list a final element that ask if the comic is not there and redirects to a survey
+- [ ] Create survey
+  - [ ] For new features
+  - [ ] For new comics 
 *** TODO Create a favorites strips
 *** TODO Improve notification with a preview of the new strips
     
