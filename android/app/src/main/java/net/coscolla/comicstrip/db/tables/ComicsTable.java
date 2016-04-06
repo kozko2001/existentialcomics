@@ -16,16 +16,23 @@
 
 package net.coscolla.comicstrip.db.tables;
 
+
 public class ComicsTable {
 
   public static final String TABLE = "comics";
 
   public static final String COLUMN_NAME = "name";
+  public static final String COLUMN_ID = "id";
+  public static final String COLUMN_URL = "url";
+  public static final String COLUMN_IMAGE = "image";
 
 
   public static String getCreateTableQuery() {
     return "CREATE TABLE " + TABLE + " ( "
-        + COLUMN_NAME + " TEXT NOT NULL "
+        + COLUMN_NAME + " TEXT NOT NULL ,"
+        + COLUMN_ID + " TEXT NOT NULL ,"
+        + COLUMN_URL + " TEXT NOT NULL ,"
+        + COLUMN_IMAGE + " TEXT NOT NULL"
         + ");";
   }
 }

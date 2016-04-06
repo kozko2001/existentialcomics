@@ -16,10 +16,15 @@
 
 package net.coscolla.comicstrip.entities;
 
+import org.parceler.Parcel;
+
 /**
  * Entity refering to the comics available to see
  */
+@Parcel
 public class Comic {
   public String name;
-
+  public String comic_id;
+  public String image;
+  public String url;
 }

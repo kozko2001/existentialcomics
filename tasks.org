@@ -11,9 +11,9 @@
 
  Make the first screen be more atractive to new users
 
-  - [ ] Change backend so the comics requests returns more information
-    - [ ] Return title of each comic
-    - [ ] Return last strip entity
+  - [-] Change backend so the comics requests returns more information
+    - [X] Return title of each comic
+    - [ ] Sort by fav / non fav (app side)
 
 *** TODO Some analytics to know the users which comic are more subscribed and more used
   - [ ] See if we can use the fabrics answer analytics supports all the features
@@ -24,7 +24,9 @@
   - [ ] Make the release to the play store 
 
 ** Roadmap   
-
+* Create in the 
+*** TODO Shown last strip in the comic menu
+    - [ ] Return last strip entity
 *** TODO Tablet layout
 *** TODO Create a timeline to see all new strips with filtering for 
 *** TODO Make a survey to now which strips are more demanded

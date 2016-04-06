@@ -31,8 +31,8 @@ public class ComicDeleteResolver extends DefaultDeleteResolver<Comic> {
   protected DeleteQuery mapToDeleteQuery(@NonNull Comic comic) {
     return DeleteQuery.builder()
         .table(ComicsTable.TABLE)
-        .where(ComicsTable.COLUMN_NAME + " = ?")
-        .whereArgs(comic.name)
+        .where(ComicsTable.COLUMN_ID + " = ?")
+        .whereArgs(comic.comic_id)
         .build();
   }
 }

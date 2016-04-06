@@ -41,8 +41,8 @@ public class ComicPutResolver extends DefaultPutResolver<Comic> {
   protected UpdateQuery mapToUpdateQuery(@NonNull Comic comic) {
     return UpdateQuery.builder()
         .table(ComicsTable.TABLE)
-        .where(ComicsTable.COLUMN_NAME+ " = ? ")
-        .whereArgs(comic.name)
+        .where(ComicsTable.COLUMN_ID + " = ? ")
+        .whereArgs(comic.comic_id)
         .build();
   }
 
@@ -51,6 +51,9 @@ public class ComicPutResolver extends DefaultPutResolver<Comic> {
   protected ContentValues mapToContentValues(@NonNull Comic comic) {
     ContentValues cv = new ContentValues();
     cv.put(ComicsTable.COLUMN_NAME, comic.name);
+    cv.put(ComicsTable.COLUMN_ID, comic.comic_id);
+    cv.put(ComicsTable.COLUMN_URL, comic.url);
+    cv.put(ComicsTable.COLUMN_IMAGE, comic.image);
     return cv;
   }
 }

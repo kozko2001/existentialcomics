@@ -18,7 +18,9 @@ package net.coscolla.comicstrip.ui.list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +35,7 @@ import com.annimon.stream.Stream;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
+import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
@@ -57,7 +60,7 @@ import static rx.schedulers.Schedulers.io;
 
 public class ListStripsActivity extends AppCompatActivity {
 
-  public static final String INTENT_ARG_COMIC_NAME = "comicName";
+  public static final String INTENT_ARG_COMIC = "comic";
 
   @Bind(R.id.list) RecyclerView list;
 
@@ -65,8 +68,12 @@ public class ListStripsActivity extends AppCompatActivity {
   @Inject StripAdapter listAdapter;
   @Inject ListStripsUseCase useCase;
   @Inject PushSubscribeUseCase subscribeUseCase;
+
   private List<Strip> listData;
   private Subscription subscription;
+
+  private Comic comic;
+
   /**
    * Callback to receive which item of the list was selected
    *
@@ -77,23 +84,15 @@ public class ListStripsActivity extends AppCompatActivity {
       openDetailActivity(model);
     }
   });
-
-  public static Intent createIntent(Context context, String comicName) {
-    Intent intent = new Intent(context, ListStripsActivity.class);
-    intent.putExtra(INTENT_ARG_COMIC_NAME, comicName);
-    return intent;
-  }
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_list_strips);
 
     Graph.getInstance().getListStripsComponent().inject(this);
-    setTitle(getComicName());
+    setTitle(getComic().name);
 
     ButterKnife.bind(this);
-
 
     configureList();
 
@@ -117,7 +116,7 @@ public class ListStripsActivity extends AppCompatActivity {
    * Starts observing the model and updates the list if there is new data
    */
   private void startListeningModel() {
-    subscription = useCase.model(getComicName())
+    subscription = useCase.model(getComicId())
         .subscribeOn(io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
@@ -131,10 +130,10 @@ public class ListStripsActivity extends AppCompatActivity {
    * Makes a new request and updates the data of the model
    */
   private void request() {
-    useCase.refresh(getComicName())
+    useCase.refresh(getComicId())
         .subscribeOn(io())
         .doOnNext(list -> Timber.d("New %d comics fetched ", list.size()))
-        .flatMap(l -> useCase.model(getComicName()))
+        .flatMap(l -> useCase.model(getComicId()))
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             this::updateList,
@@ -219,7 +218,7 @@ public class ListStripsActivity extends AppCompatActivity {
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    Boolean isSubscribed = subscribeUseCase.isSubscribed(getComicName());
+    Boolean isSubscribed = subscribeUseCase.isSubscribed(getComicId());
 
     MenuItem togglePushNotification = menu.findItem(R.id.menu_push_notification);
 
@@ -235,18 +234,40 @@ public class ListStripsActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if(item.getItemId() == R.id.menu_push_notification) {
-      subscribeUseCase.toogleSubscribe(getComicName())
+      subscribeUseCase.toogleSubscribe(getComicId())
           .observeOn(AndroidSchedulers.mainThread())
           .subscribe(
-              b -> Timber.d("toggle subscription on %s", getComicName()) ,
+              b -> Timber.d("toggle subscription on %s", getComicId()) ,
               e -> Timber.e(e, "Error during the request to the push notification"),
               this::invalidateOptionsMenu);
+    }
+
+    if(item.getItemId() == R.id.open_browser) {
+      Uri url = Uri.parse(getComic().url);
+      if(url != null) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, url);
+        startActivity(browserIntent);
+      }
     }
 
     return super.onOptionsItemSelected(item);
   }
 
-  private String getComicName() {
-    return getIntent().getStringExtra(INTENT_ARG_COMIC_NAME);
+  private Comic getComic() {
+    if(comic == null) {
+      comic = Parcels.unwrap(getIntent().getParcelableExtra("comic"));
+    }
+    return comic;
   }
+
+  private String getComicId() {
+    return getComic().comic_id;
+  }
+
+  public static Intent createIntent(Context context, Comic comic) {
+    Intent intent = new Intent(context, ListStripsActivity.class);
+    intent.putExtra(INTENT_ARG_COMIC, Parcels.wrap(comic));
+    return intent;
+  }
+
 }

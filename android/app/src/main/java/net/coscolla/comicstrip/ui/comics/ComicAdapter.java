@@ -20,7 +20,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.ImageVideoBitmapDecoder;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.ui.AdapterCallback;
@@ -70,6 +74,8 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicViewHolder>{
 class ComicViewHolder extends RecyclerView.ViewHolder {
 
   private final TextView title;
+  private final ImageView image;
+
   private ComicAdapterModel data;
   private AdapterCallback<ComicAdapterModel> callback;
 
@@ -77,15 +83,19 @@ class ComicViewHolder extends RecyclerView.ViewHolder {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
+    this.image = (ImageView) itemView.findViewById(R.id.image);
+
     this.callback = callback;
 
     itemView.setOnClickListener(onRowSelected);
-    itemView.setOnLongClickListener(onLongSelected);
   }
 
   public void bind(ComicAdapterModel comic) {
     this.data = comic;
-    title.setText(comic.comicName);
+    title.setText(comic.name);
+    Glide.with(itemView.getContext())
+        .load(comic.image)
+        .into(image);
   }
 
   private final View.OnClickListener onRowSelected = new View.OnClickListener() {
@@ -94,16 +104,6 @@ class ComicViewHolder extends RecyclerView.ViewHolder {
       if(callback != null) {
         callback.onEvent(ComicAdapter.SELECTED, data);
       }
-    }
-  };
-
-  private final View.OnLongClickListener onLongSelected = new View.OnLongClickListener() {
-    @Override
-    public boolean onLongClick(View v) {
-      if(callback != null) {
-        callback.onEvent(ComicAdapter.LONG_SELECTED, data);
-      }
-      return true;
     }
   };
 }

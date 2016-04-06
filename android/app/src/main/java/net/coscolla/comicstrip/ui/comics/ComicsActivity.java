@@ -29,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
@@ -68,6 +69,7 @@ public class ComicsActivity extends AppCompatActivity {
   private List<ComicAdapterModel> data;
 
   private CompositeSubscription subscription;
+  private List<Comic> comics;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -191,9 +193,10 @@ public class ComicsActivity extends AppCompatActivity {
   /**
    * When the data is received either from network or from cache update the list
    *
-   * @param list data with the comic name from the api
+   * @param list data with the comics name from the api
    */
   private void onDataReceived(@NonNull  List<Comic> list) {
+    comics = list;
     this.data = Stream.of(list)
         .map(this::convertToModel)
         .collect(Collectors.toList());
@@ -202,12 +205,12 @@ public class ComicsActivity extends AppCompatActivity {
   }
 
   /**s
-   * Converts the raw comic api to the model for the adapter
+   * Converts the raw comics api to the model for the adapter
    * @param comic list of strings with the comics name
-   * @return list of ComicAdapterModel with the comic name
+   * @return list of ComicAdapterModel with the comics name
    */
   private ComicAdapterModel convertToModel(Comic comic) {
-    return new ComicAdapterModel(comic.name);
+    return new ComicAdapterModel(comic);
   }
 
   /**
@@ -234,10 +237,15 @@ public class ComicsActivity extends AppCompatActivity {
   /**
    * Opens the list strips activity
    *
-   * @param comic name of the comic to be opened
+   * @param comic name of the comics to be opened
    */
   private void openStrips(@NonNull  ComicAdapterModel comic) {
-    Intent intent = ListStripsActivity.createIntent(this, comic.comicName);
+    Comic _comic = Stream.of(comics)
+        .filter(value -> value.comic_id.equals(comic.id))
+        .findFirst()
+        .get();
+
+    Intent intent = ListStripsActivity.createIntent(this, _comic);
     this.startActivity(intent);
   }
 

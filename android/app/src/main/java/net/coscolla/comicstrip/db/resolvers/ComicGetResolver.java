@@ -32,8 +32,14 @@ public class ComicGetResolver extends DefaultGetResolver<Comic> {
     Comic comic = new Comic();
 
     String name = cursor.getString(cursor.getColumnIndexOrThrow(ComicsTable.COLUMN_NAME));
+    String id = cursor.getString(cursor.getColumnIndexOrThrow(ComicsTable.COLUMN_ID));
+    String image = cursor.getString(cursor.getColumnIndexOrThrow(ComicsTable.COLUMN_IMAGE));
+    String url = cursor.getString(cursor.getColumnIndexOrThrow(ComicsTable.COLUMN_URL));
 
     comic.name = name;
+    comic.url = url;
+    comic.image = image;
+    comic.comic_id = id;
 
     return comic;
   }

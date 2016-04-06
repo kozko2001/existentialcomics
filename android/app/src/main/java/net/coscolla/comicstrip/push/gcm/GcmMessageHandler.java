@@ -73,7 +73,7 @@ public class GcmMessageHandler extends GcmListenerService {
 
   private PendingIntent createIntent(String comic) {
     Intent intent = new Intent(this, ListStripsActivity.class);
-    intent.putExtra(ListStripsActivity.INTENT_ARG_COMIC_NAME, comic);
+    intent.putExtra(ListStripsActivity.INTENT_ARG_COMIC, comic);
 
     return PendingIntent.getActivity(
             this,

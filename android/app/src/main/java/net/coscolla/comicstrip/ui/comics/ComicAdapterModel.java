@@ -16,6 +16,8 @@
 
 package net.coscolla.comicstrip.ui.comics;
 
+import net.coscolla.comicstrip.entities.Comic;
+
 import org.parceler.Parcel;
 
 /**
@@ -26,13 +28,20 @@ import org.parceler.Parcel;
  */
 @Parcel
 public class ComicAdapterModel {
-  public String comicName;
+  public String name;
+  public String id;
+  public String url;
+  public String image;
 
   public ComicAdapterModel() {
 
   }
 
-  public ComicAdapterModel(String name) {
-    this.comicName = name;
+  public ComicAdapterModel(Comic comic) {
+    name = comic.name;
+    id = comic.comic_id;
+    url = comic.url;
+    image = comic.image;
   }
+
 }

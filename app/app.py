@@ -25,8 +25,9 @@ class JSONEncoder(json.JSONEncoder):
 
 @app.route("/comics")
 def listComics():
-    all_comics = comics.distinct('comic')
-    all_comics = map(lambda c: {'name': c}, all_comics)
+    collection = db['comics_info']
+    cursor = collection.find({})
+    all_comics = json.loads(JSONEncoder().encode(list(cursor)))  # Ugly hack to remove objectid
 
     result = {
         'comics': all_comics
