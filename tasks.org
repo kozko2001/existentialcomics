@@ -11,9 +11,9 @@
 
  Make the first screen be more atractive to new users
 
-  - [-] Change backend so the comics requests returns more information
+  - [X] Change backend so the comics requests returns more information
     - [X] Return title of each comic
-    - [ ] Sort by fav / non fav (app side)
+    - [X] Sort by fav / non fav (app side)
 
 *** TODO Some analytics to know the users which comic are more subscribed and more used
   - [ ] See if we can use the fabrics answer analytics supports all the features
