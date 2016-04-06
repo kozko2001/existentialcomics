@@ -29,7 +29,7 @@ public class RxFileUtils {
    * @return observable with the data inside the file
    */
   public Observable<byte[]> readFile(String file) {
-    File f = FileUtils.getFile(root, file);
+    File f = getFile(file);
 
     return Observable.defer(() ->
         just(1)
@@ -51,11 +51,20 @@ public class RxFileUtils {
    * @return An observable that emits true when the data is written
    */
   public Observable<Boolean> writeFile(String file, byte[] data) {
-    File f = FileUtils.getFile(root, file);
+    File f = getFile(file);
 
     return Observable.defer(() -> Observable.fromCallable(() -> {
       FileUtils.writeByteArrayToFile(f, data);
       return true;
     }));
+  }
+
+  /**
+   * Gets the file where to seek the cache
+   *
+   * @param file filename of the cache file
+   */
+  public File getFile(String file) {
+    return FileUtils.getFile(root, file);
   }
 }

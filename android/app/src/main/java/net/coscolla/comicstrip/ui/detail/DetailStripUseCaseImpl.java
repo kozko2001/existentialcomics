@@ -1,6 +1,7 @@
 package net.coscolla.comicstrip.ui.detail;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import net.coscolla.comicstrip.db.ComicCache;
 import net.coscolla.comicstrip.entities.Strip;
@@ -8,6 +9,7 @@ import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.usecases.DetailStripUseCase;
 import net.coscolla.comicstrip.utils.RxFileUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 import rx.Observable;
@@ -63,5 +65,16 @@ public class DetailStripUseCaseImpl implements DetailStripUseCase {
   public Observable<Strip> getStripById(@NonNull String id) {
     return database.getStripById(id)
         .subscribeOn(io());
+  }
+
+  @Nullable
+  @Override
+  public String getShareImagePath(@NonNull Strip strip) {
+    File f = fs.getFile(strip._id);
+    if(f.exists()) {
+      return f.getAbsolutePath();
+    } else {
+      return null;
+    }
   }
 }

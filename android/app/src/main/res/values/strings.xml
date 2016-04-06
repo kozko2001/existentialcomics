@@ -6,4 +6,5 @@
     <string name="unsubscribe">Unsubscribe</string>
     <string name="retry">Retry</string>
     <string name="error_try_again">Could not download the image, please make sure you have connection and try again.</string>
+    <string name="share">Share</string>
 </resources>

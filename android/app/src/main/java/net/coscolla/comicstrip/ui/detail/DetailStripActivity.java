@@ -21,8 +21,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -54,6 +56,7 @@ public class DetailStripActivity extends AppCompatActivity {
 
   private String[] strip_ids;
   private Strip currentStrip;
+  private ShareActionProvider shareProvider;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -119,7 +122,36 @@ public class DetailStripActivity extends AppCompatActivity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.detail_strip_menu, menu);
+    MenuItem item = menu.findItem(R.id.menu_item_share);
+
+    // Configures the share button
+    Intent shareIntent = getShareIntent();
+
+    shareProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+    shareProvider.setShareIntent(shareIntent);
     return true;
+  }
+
+  @NonNull
+  private Intent getShareIntent() {
+    Intent shareIntent = new Intent();
+    shareIntent.setAction(Intent.ACTION_SEND);
+
+    shareIntent.putExtra(Intent.EXTRA_TEXT, "See this strip: " +
+        currentStrip.title + " from " + currentStrip.url + " via ComicStrip App");
+    shareIntent.setType("text/plain");
+
+    /*
+    Not working properly, removed for release
+    String imagePath = useCase.getShareImagePath(currentStrip);
+    if(imagePath != null) {
+      Uri imageUri = Uri.parse(imagePath);
+      shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+      shareIntent.setType("image/png");
+    }
+    */
+    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    return shareIntent;
   }
 
   @Override
@@ -140,5 +172,8 @@ public class DetailStripActivity extends AppCompatActivity {
     this.currentStrip = currentStrip;
     setTitle(currentStrip.title);
     analytics.eventStripViewed(currentStrip);
+    if(shareProvider != null) {
+      shareProvider.setShareIntent(getShareIntent());
+    }
   }
 }
