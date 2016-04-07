@@ -1,4 +1,4 @@
-package net.coscolla.comicstrip.analytics;
+package net.coscolla.comicstrip.marketing.analytics;
 
 import net.coscolla.comicstrip.entities.Strip;
 

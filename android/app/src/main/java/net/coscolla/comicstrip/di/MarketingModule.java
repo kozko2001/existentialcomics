@@ -2,9 +2,9 @@ package net.coscolla.comicstrip.di;
 
 import com.crashlytics.android.answers.BuildConfig;
 
-import net.coscolla.comicstrip.analytics.AnaltyticsManagerDebug;
-import net.coscolla.comicstrip.analytics.AnalyticsManager;
-import net.coscolla.comicstrip.analytics.IAnalytics;
+import net.coscolla.comicstrip.marketing.analytics.AnaltyticsManagerDebug;
+import net.coscolla.comicstrip.marketing.analytics.AnalyticsManager;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 
 import javax.inject.Singleton;
 
@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class AnalyticsModule {
+public class MarketingModule {
 
   @Provides @Singleton
   public IAnalytics providesAnaltytics() {

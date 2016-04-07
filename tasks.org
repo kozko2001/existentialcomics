@@ -23,6 +23,13 @@ Make the first screen be more atractive to new users
 <2016-04-03 Sun>
 - [X] Create a new share icon while vieweing a strip
 - [X] Test sharing with whatsapp, twitter, facebook
+  
+*** DONE ADD Rating 
+- [X] ADD library to ask the users to rate app after a time
+  
+*** TODO ADD Show case 
+- [ ] Replace the current material library with the showcase
+- [ ] http://stackoverflow.com/questions/28224301/targeting-action-bar-menu-items-with-showcaseview
 
 *** TODO Release v 1.0
 - [ ] Make the screenshots
