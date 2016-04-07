@@ -29,7 +29,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Predicate;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import net.coscolla.comicstrip.R;
 import net.coscolla.comicstrip.di.Graph;
@@ -86,7 +86,6 @@ public class ComicsActivity extends AppCompatActivity {
     configureList();
 
     subscription = new CompositeSubscription();
-
   }
 
   @Override
@@ -100,6 +99,10 @@ public class ComicsActivity extends AppCompatActivity {
     } else {
       updateAdapter();
     }
+
+    // Rating
+    RateThisApp.onStart(this);
+    RateThisApp.showRateDialogIfNeeded(this);
   }
 
   @Override

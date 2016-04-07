@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
+import com.kobakei.ratethisapp.RateThisApp;
 import com.squareup.leakcanary.LeakCanary;
 
 import net.coscolla.comicstrip.di.Graph;
@@ -35,6 +36,14 @@ public class App extends Application{
     setupLogging();
 
     setupPush();
+
+    setupRate();
+  }
+
+  private void setupRate() {
+    // Custom criteria: 3 days and 10 launches
+    RateThisApp.Config config = new RateThisApp.Config(3, 10);
+    RateThisApp.init(config);
   }
 
   private void setupLogging() {

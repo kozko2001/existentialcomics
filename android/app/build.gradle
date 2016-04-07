@@ -132,6 +132,9 @@ dependencies {
     }
     compile 'net.ypresto.timbertreeutils:timbertreeutils:1.0.0'
     compile 'commons-io:commons-io:2.4'
+    compile ('io.github.kobakei:ratethisapp:1.0.2') {
+        exclude module: 'appcompat-v7'
+    }
 
 
     // canary leak
