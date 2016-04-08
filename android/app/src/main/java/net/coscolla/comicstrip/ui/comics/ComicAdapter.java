@@ -74,6 +74,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicViewHolder>{
 class ComicViewHolder extends RecyclerView.ViewHolder {
 
   private final TextView title;
+  private final TextView url;
   private final ImageView image;
 
   private ComicAdapterModel data;
@@ -83,6 +84,7 @@ class ComicViewHolder extends RecyclerView.ViewHolder {
     super(itemView);
 
     this.title = (TextView) itemView.findViewById(R.id.title);
+    this.url = (TextView) itemView.findViewById(R.id.url);
     this.image = (ImageView) itemView.findViewById(R.id.image);
 
     this.callback = callback;
@@ -93,6 +95,7 @@ class ComicViewHolder extends RecyclerView.ViewHolder {
   public void bind(ComicAdapterModel comic) {
     this.data = comic;
     title.setText(comic.name);
+    url.setText(comic.url);
     Glide.with(itemView.getContext())
         .load(comic.image)
         .into(image);

@@ -26,7 +26,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "net.coscolla.comicstrip"
+        applicationId "net.coscolla.comicstrip2"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
