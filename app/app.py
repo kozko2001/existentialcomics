@@ -29,6 +29,10 @@ def listComics():
     cursor = collection.find({})
     all_comics = json.loads(JSONEncoder().encode(list(cursor)))  # Ugly hack to remove objectid
 
+    app_version = request.environ["HTTP_APP"] if "HTTP_APP" in request.environ else None
+    if app_version == "1":
+        all_comics = filter(lambda c: c["comic_id"] in ["existentialcomics", "commitstrip"], all_comics)
+
     result = {
         'comics': all_comics
     }

@@ -18,6 +18,7 @@ package net.coscolla.comicstrip.di;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -51,6 +52,19 @@ public class AppModule {
 
     } catch (PackageManager.NameNotFoundException e) {
       return null;
+    }
+
+  }
+
+  @Provides
+  @Named("app_version")
+  public Integer providesAppVersion() {
+    PackageInfo pInfo = null;
+    try {
+      pInfo = appContext.getPackageManager().getPackageInfo(appContext.getPackageName(), 0);
+      return pInfo.versionCode;
+    } catch (PackageManager.NameNotFoundException e) {
+      return 0;
     }
 
   }
