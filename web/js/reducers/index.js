@@ -1,1 +1,5 @@
-export {default as Api} from './Api';
+import listComicReducer from './ListComicReducer';
+
+console.log(listComicReducer);
+
+export {listComicReducer}

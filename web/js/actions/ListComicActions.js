@@ -1,14 +1,5 @@
-import {TITLE_CHANGED} from '../constants/ActionTypes';
 import {COMIC_ON_LODING, COMIC_SUCCEDED, COMIC_FAILED} from '../constants/ActionTypes';
 import 'isomorphic-fetch';
-
-
-export function changeTitle(text) {
-  return {
-    type: TITLE_CHANGED,
-    text
-  };
-}
 
 function onLoadingComics() {
   return {

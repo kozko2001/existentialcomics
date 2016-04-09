@@ -2,9 +2,9 @@ import {expect} from 'chai'
 import nock from 'nock'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import {fetchComics} from '../js/actions/HomeActions'
+import {fetchComics} from '../js/actions/ListComicActions'
 import * as types from '../js/constants/ActionTypes'
-import reducer from '../js/reducers/Api'
+import reducer from '../js/reducers/ListComicReducer'
 
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
