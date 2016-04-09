@@ -29,10 +29,13 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js$/, loaders: ['babel'], exclude: /node_modules/ },
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('css-loader?module!cssnext-loader') }
+      { test: /\.scss$/, loader: 'style-loader!css-loader!sass'}
     ]
   },
+  sassLoader: {
+    includePaths: [path.resolve(__dirname, "node_modules")]
+  },
   resolve: {
-    extensions: ['', '.js', '.json']
+    extensions: ['', '.js', '.json', '.scss']
   }
 };
