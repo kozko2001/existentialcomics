@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as ListComicActions from '../actions/ListComicActions';
 import styles from '../../css/index.scss';
+import {Link} from 'react-router';
 
 class ListComics extends Component {
   render() {
@@ -15,6 +16,8 @@ class ListComics extends Component {
         <button onClick={(e) => actions.fetchComics()}>
           Update Title
         </button>
+	<li><Link to="/detail">Detail</Link></li>
+
       </main>
     );
   }
