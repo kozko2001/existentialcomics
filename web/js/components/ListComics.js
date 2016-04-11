@@ -7,27 +7,29 @@ import {Link} from 'react-router';
 import ComicCard from './ComicCard';
 
 class ListComics extends Component {
-  render() {
-    const {title, dispatch} = this.props;
+  componentDidMount() {
+    const {dispatch} = this.props;
     const actions = bindActionCreators(ListComicActions, dispatch);
-    const titles = this.props.data.map((comic) => <div>{comic.comic_id}</div>);
+    actions.fetchComics();
+  }
+  
+  render() {
     return (
       <main>
-        <h1 className={styles.text}>Welcome {titles}!</h1>
-        <button onClick={(e) => actions.fetchComics()}>
-          Update Title
-        </button>
-	<li><Link to="/detail">Detail</Link></li>
 
-      <div className='mdl-grid'>
-      {this.props.data.map((comic) =>
-			   <ComicCard
-				dispatch={dispatch}
-				name={comic.name}
-				url={comic.url}
-				image={comic.image} />)}
+	<div className='mdl-grid'>
+	  {
+	    this.props.data.map((comic) =>
+				<ComicCard
+				    dispatch={this.props.dispatch}
+				    name={comic.name}
+				    url={comic.url}
+				    id={comic.comic_id}
+				    key={comic.comic_id}
+				    image={comic.image} />)
+	  }
       </div>
-      </main>
+	</main>
     );
   }
 }
