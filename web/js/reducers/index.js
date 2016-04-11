@@ -1,3 +1,4 @@
 import listComicReducer from './ListComicReducer';
+import listStripReducer from './ListStripReducer';
 
-export {listComicReducer}
+export {listComicReducer, listStripReducer}
