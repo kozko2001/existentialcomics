@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import * as ListStripActions from '../actions/ListStripActions';
 import {bindActionCreators} from 'redux'
+import LazyLoad from 'react-lazyload';
 
 class ListStrips extends Component {
 
@@ -15,13 +16,17 @@ class ListStrips extends Component {
   
   render() {
     const {comicId} = this.props.params;
-    const strips = this.props.data[comicId];
+    const strips = this.props.data[comicId] || [];
+    
+    
     return (
 	<ul>
 	<li> {comicId} </li>
 	{
-	  strips.map((strip) =>
-		     <img src={'http://comic.allocsoc.net/comics/thumbnail/' + strip._id} />)
+	    strips.map((strip) =>
+		       <LazyLoad>
+			<img height="200" width="300" src={'http://comic.allocsoc.net/comics/thumbnail/' + strip._id} />
+		       </LazyLoad>)
 	}
 	</ul>
     );
