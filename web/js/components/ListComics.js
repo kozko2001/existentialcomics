@@ -15,19 +15,18 @@ class ListComics extends Component {
   
   render() {
     return (
-      <main>
+	<main>
 
-	<div className='mdl-grid'>
-	  {
-	    this.props.data.map((comic) =>
-				<ComicCard
-				    dispatch={this.props.dispatch}
-				    name={comic.name}
-				    url={comic.url}
-				    id={comic.comic_id}
-				    key={comic.comic_id}
-				    image={comic.image} />)
-	  }
+	<div>
+	{
+	  this.props.data.map((comic) =>
+			      <ComicCard dispatch={this.props.dispatch}
+					 name={comic.name}
+					 url={comic.url}
+					 id={comic.comic_id}
+					 key={comic.comic_id}
+					 image={comic.image} />)
+	}
       </div>
 	</main>
     );

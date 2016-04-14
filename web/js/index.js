@@ -8,6 +8,7 @@ import App from './containers/App';
 import {renderDevTools} from './utils/devTools';
 import {syncHistoryWithStore} from 'react-router-redux';
 import {Router, Route, browserHistory, IndexRoute} from 'react-router';
+import style from '../css/index';
 
 const store = configureStore();
 const history = syncHistoryWithStore(browserHistory, store);

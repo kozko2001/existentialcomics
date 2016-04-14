@@ -1,3 +1,13 @@
-@import "~material-design-lite/src/color-definitions";
-@import "~material-design-lite/src/material-design-lite-grid.scss";
-@import "~material-design-lite/src/material-design-lite.scss"
+@import "~susy/sass/susy";
+
+main {
+    @include container(80em);
+
+    .comic {
+	@include gallery(3 of 12);
+
+	> div {
+	    margin-top: 2em;
+	}
+    }
+}
