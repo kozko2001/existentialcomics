@@ -8,17 +8,17 @@ import CardHeader from 'material-ui/lib/card/card-header';
 import CardMedia from 'material-ui/lib/card/card-media';
 import CardTitle from 'material-ui/lib/card/card-title';
 import Paper from 'material-ui/lib/paper';
-import FlatButton from 'material-ui/lib/flat-export';
+import FlatButton from 'material-ui/lib/flat-button';
 
 
-buttondefault class ComicCard extends Component {
+export default class ComicCard extends Component {
   constructor(props) {
     super(props)
     this.state = {
       mouseOver: false
     }
   }
-
+  
   onMouseEnter() {
     this.setState ({mouseOver: true});
   }
@@ -35,7 +35,7 @@ buttondefault class ComicCard extends Component {
     const {dispatch, name, url, image, id} = this.props;
 
     let mouseOver = this.state.mouseOver || false;
-
+    
     return (
 	<div className='comic'>
 	  <Paper zDepth={mouseOver? 4 : 1}
