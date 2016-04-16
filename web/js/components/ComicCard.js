@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Link, browserHistory } from 'react-router';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Card from 'material-ui/lib/card/card';
-import CardActions from 'material-ui/lib/card/card-actions';
-import CardHeader from 'material-ui/lib/card/card-header';
-import CardMedia from 'material-ui/lib/card/card-media';
-import CardTitle from 'material-ui/lib/card/card-title';
-import Paper from 'material-ui/lib/paper';
-import FlatButton from 'material-ui/lib/flat-button';
+import RaisedButton from 'material-ui/RaisedButton';
+import Card from 'material-ui/Card/Card';
+
+import CardActions from 'material-ui/Card/CardActions';
+import CardHeader from 'material-ui/Card/CardHeader';
+import CardMedia from 'material-ui/Card/CardMedia';
+import CardTitle from 'material-ui/Card/CardTitle';
+import Paper from 'material-ui/Paper/Paper';
+import FlatButton from 'material-ui/FlatButton';
 
 
 export default class ComicCard extends Component {
@@ -49,7 +50,7 @@ export default class ComicCard extends Component {
 		<img src={image}  />
 	      </CardMedia>
 	      <CardActions>
-		<RaisedButton label="See more strips" primary={true} style={style}/>
+		<RaisedButton label="See more strips" primary={true} />
 	      </CardActions>
 	    </Card>
 	  </Paper>

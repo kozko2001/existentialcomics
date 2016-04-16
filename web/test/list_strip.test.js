@@ -57,26 +57,43 @@ describe('strips list', () => {
   describe('reducers', () => {
     it('initial state', () => {
       const initialState = reducer(undefined, {});
-      const expectedState = {loading: false, data: {}, last_error: undefined }
-      
+      const expectedState = {
+	loading: false,
+	data: [],
+	last_error: undefined,
+	selected: undefined,
+	comic_id: undefined
+      }
       
       expect(initialState).to.deep.equal(expectedState);
     });
     it('state after start loading the data', () => {
-      const initialState = {loading: false, data: {}, last_error: 'error'};
-      const expectedState = {loading: true, data: {}, last_error: 'error' }
+      const initialState = {
+	loading: false,
+	data: [],
+	last_error: 'error',
+	selected: undefined,
+	comic_id: undefined
+      };
+      const expectedState = {
+	loading: true,
+	data: [],
+	last_error: 'error',
+	selected: undefined,
+	comic_id: undefined
+      }
       const state = reducer(initialState, {type: types.STRIP_ON_LODING});
       
       expect(state).to.deep.equal(expectedState);
     })
     it('data fetched...', () => {
-      const initialState = {loading: true, data: {}, last_error: 'error'};
+      const initialState = {loading: true, data: [], last_error: 'error'};
       const expectedState = {
 	loading: false,
-	data: {
-	  'xkcd': [stripTest]
-	},
-	last_error: undefined
+	data: [stripTest],
+	last_error: undefined,
+	selected: stripTest,
+	comic_id: 'xkcd'
       };
 
       const state = reducer(initialState, {
@@ -84,6 +101,33 @@ describe('strips list', () => {
 	data: [stripTest],
 	comic_id: 'xkcd'
       });
+      expect(state).to.deep.equal(expectedState);
+    })
+    
+    it('change selected strip', () => {
+      let strip1 = {...stripTest, _id: 1}
+      let strip2 = {...stripTest, _id: 2}
+      
+      const initialState = {
+	loading: false,
+	data: [strip1, strip2],
+	last_error: undefined,
+	selected: strip1,
+	comic_id: 'xkcd'
+      };
+      const expectedState = {
+	loading: false,
+	data: [strip1, strip2],
+	last_error: undefined,
+	selected: strip2,
+	comic_id: 'xkcd'
+      };
+
+      const state = reducer(initialState, {
+	type: types.STRIP_SELECT,
+	data: strip2
+      });
+      
       expect(state).to.deep.equal(expectedState);
     })
   });

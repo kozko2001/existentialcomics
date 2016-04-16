@@ -1,4 +1,5 @@
-import {STRIP_ON_LODING, STRIP_SUCCEDED, STRIP_FAILED} from '../constants/ActionTypes';
+import {STRIP_SELECT, STRIP_ON_LODING, STRIP_SUCCEDED, STRIP_FAILED} from '../constants/ActionTypes';
+
 import 'isomorphic-fetch';
 
 function onLoadingStrips() {
@@ -21,6 +22,13 @@ function onStripFailed(err) {
     type: STRIP_FAILED,
     err
   };
+}
+
+export function onChangeStripSelected(strip) {
+  return {
+    type: STRIP_SELECT,
+    data: strip
+  }
 }
 
 export function fetchStrips(comic_id) {

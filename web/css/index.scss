@@ -10,4 +10,19 @@ main {
 	    margin-top: 2em;
 	}
     }
+
+
+    .strips {
+	
+	img {
+	    @include span(8 of 12);
+	    @include push(2 of 12)
+	}
+	.toolbar {
+	    margin: 0 auto;
+	    width: span(3 of 12);
+	    margin-bottom: 2em;
+	}
+
+    }
 }
