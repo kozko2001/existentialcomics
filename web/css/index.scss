@@ -1,7 +1,12 @@
 @import "~susy/sass/susy";
 
+body {
+    margin: 0;
+}
+
 main {
     @include container(80em);
+    font-family: Roboto, sans-serif;
 
     .comic {
 	@include gallery(3 of 12);
@@ -21,7 +26,8 @@ main {
 	.toolbar {
 	    margin: 0 auto;
 	    width: span(3 of 12);
-	    margin-bottom: 2em;
+	    margin-bottom: 1em;
+	    margin-top: 2em;
 	}
 
     }

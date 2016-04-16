@@ -5,6 +5,9 @@ import * as ListStripActions from '../actions/ListStripActions';
 import {bindActionCreators} from 'redux'
 import LazyLoad from 'react-lazyload';
 import FlatButton from 'material-ui/FlatButton';
+import AppBar from 'material-ui/AppBar';
+import IconButton from 'material-ui/IconButton';
+import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 
 class ListStrips extends Component {
 
@@ -45,7 +48,6 @@ class ListStrips extends Component {
   }
   
   render() {
-    console.log(this.props);
     let currentStripIndex = this.getCurrentStripIndex()
 
     if(currentStripIndex >= 0) {
@@ -56,16 +58,23 @@ class ListStrips extends Component {
       let goNewer = () => this.actionGoNewer();
       let goLater = () => this.actionGoLater();
       let goRandom = () => this.actionGoRandom();
+      let goBackToStrips = () => location.href = '/';
+      let goToOriginalSite = () => window.open(strip.url, '_blank');
       
       return (
 	<main>
+	  <AppBar
+	    title={strip.title}
+	    iconElementLeft={<IconButton onClick={goBackToStrips}><ArrowBack/></IconButton>}
+	    iconElementRight={<FlatButton label='Go to original site' onClick={goToOriginalSite} />}
+	    /> 
 	  <div className='strips'>
 	    <div className='toolbar'>
 	      <FlatButton disabled={!canGoNewer} primary={true} onClick={goNewer}>
 		&lt;
 	      </FlatButton>
 	      <FlatButton primary={true} onClick={goRandom}>
-		Rand
+		Random
 	      </FlatButton>
 	      <FlatButton disabled={!canGoLater} primary={true} onClick={goLater}>
 		&gt;
