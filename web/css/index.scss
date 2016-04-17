@@ -1,15 +1,33 @@
 @import "~susy/sass/susy";
+@import "~breakpoint-sass/stylesheets/breakpoint";
+
+
+$desktop: 800px;
 
 body {
     margin: 0;
 }
 
 main {
-    @include container(80em);
     font-family: Roboto, sans-serif;
 
+    // mobile
+    @include container(95%);
+
+    // desktop
+    @include breakpoint($desktop) {
+    	@include container(80%);
+    }
+
     .comic {
-	@include gallery(3 of 12);
+
+	// mobile 
+	@include gallery(6 of 12);
+
+	// desktop
+	@include breakpoint($desktop) {
+	     @include gallery(3 of 12);
+	}
 
 	> div {
 	    margin-top: 2em;
@@ -18,17 +36,37 @@ main {
 
 
     .strips {
-	
+
 	img {
-	    @include span(8 of 12);
-	    @include push(2 of 12)
+	    // mobile
+	    @include span(12 of 12);
+
+	    // desktop
+	    @include breakpoint($desktop) {
+		@include span(8 of 12);
+		@include push(2 of 12)
+	    }
 	}
+
 	.toolbar {
 	    margin: 0 auto;
-	    width: span(3 of 12);
+	    
+	    // mobile
+	    @include span(12 of 12);
+
+	    // desktop
+	    @include breakpoint($desktop) {
+		@include span(6 of 12);
+		@include push(3 of 12);
+	    }
 	    margin-bottom: 1em;
 	    margin-top: 2em;
+
+	    button {
+		width: span(2 of 6 inside);
+	    }
 	}
 
     }
 }
+
