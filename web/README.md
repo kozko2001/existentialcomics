@@ -20,5 +20,5 @@ $ DEBUG=false npm start
 To build for production, this command will output optimized production code:
 
 ```bash
-$ npm run build
+$ NODE_ENV=production npm run build
 ```
