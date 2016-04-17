@@ -11,7 +11,8 @@ let defaultState = {
 export default function(state = defaultState, action) {
   switch (action.type) {
   case ActionTypes.STRIP_ON_LODING:
-    return { ...state, loading: true, selected: undefined}
+    var cache = JSON.parse(localStorage.getItem(action.comic_id))
+    return { ...state, loading: true, selected: undefined, data: cache}
   case ActionTypes.STRIP_SUCCEDED:
     return {
 	...state,

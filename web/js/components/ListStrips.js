@@ -25,7 +25,11 @@ class ListStrips extends Component {
 
   getCurrentStripIndex() {
     let strips = this.props.data;
-    return strips.findIndex((strip) => strip === this.props.selected);
+    if(strips) {
+      return strips.findIndex((strip) => strip === this.props.selected);
+    } else {
+      return -1;
+    }
   }
 
   actionGoNewer(e) {

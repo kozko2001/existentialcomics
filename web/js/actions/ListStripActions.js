@@ -2,9 +2,10 @@ import {STRIP_SELECT, STRIP_ON_LODING, STRIP_SUCCEDED, STRIP_FAILED} from '../co
 
 import 'isomorphic-fetch';
 
-function onLoadingStrips() {
+function onLoadingStrips(comic_id) {
   return {
-    type: STRIP_ON_LODING
+    type: STRIP_ON_LODING,
+    comic_id
   };
 }
 
@@ -33,13 +34,21 @@ export function onChangeStripSelected(strip) {
 
 export function fetchStrips(comic_id) {
   return function(dispatch, getState) {
-    dispatch(onLoadingStrips()); // sets the loading state
+    
+    dispatch(onLoadingStrips(comic_id)); // sets the loading state
 
-    return fetch('http://comic.allocsoc.net/comics/' + comic_id)
+    // just ask for the comics we have never listed
+    let cache = JSON.parse(localStorage.getItem(comic_id))
+    let last_item = cache ? cache[0] : undefined
+    let second_param = last_item ? `/${last_item._id}`: ''
+
+    return fetch('http://comic.allocsoc.net/comics/' + comic_id + second_param)
       .then(function(response) {
 	return response.json();
       }).then(function(json) {
-	dispatch(onStripsSucced(comic_id, json['result']));
+	let result = json['result'].concat(cache);
+	localStorage.setItem(comic_id, JSON.stringify(result));
+	dispatch(onStripsSucced(comic_id, result));
       }).catch(function(err) {
 	dispatch(onStripFailed(err));
       });
