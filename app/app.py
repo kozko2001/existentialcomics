@@ -5,8 +5,12 @@ import json
 import gridfs
 import requests
 from itertools import takewhile
+from flask.ext.cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
+
 
 # mongo db connection
 connection = pymongo.MongoClient('mongo')
