@@ -14,6 +14,14 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
+app.get('*manifest.json', function(req, res) {
+  res.sendFile(path.join(__dirname, 'dist/manifest.json'));
+});
+
+app.get('*service-worker.js', function(req, res) {
+  res.sendFile(path.join(__dirname, 'dist/service-worker.js'));
+});
+
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

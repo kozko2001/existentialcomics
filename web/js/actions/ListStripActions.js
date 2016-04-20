@@ -1,4 +1,5 @@
 import {STRIP_SELECT, STRIP_ON_LODING, STRIP_SUCCEDED, STRIP_FAILED} from '../constants/ActionTypes';
+import {API_ENDPOINT} from '../constants/Constants';
 
 import 'isomorphic-fetch';
 
@@ -42,7 +43,7 @@ export function fetchStrips(comic_id) {
     let last_item = cache ? cache[0] : undefined
     let second_param = last_item ? `/${last_item._id}`: ''
 
-    return fetch('http://comic.allocsoc.net/comics/' + comic_id + second_param)
+    return fetch(`${API_ENDPOINT}comics/${comic_id}${second_param}`)
       .then(function(response) {
 	return response.json();
       }).then(function(json) {

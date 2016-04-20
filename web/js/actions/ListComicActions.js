@@ -1,4 +1,6 @@
 import {COMIC_ON_LODING, COMIC_SUCCEDED, COMIC_FAILED} from '../constants/ActionTypes';
+import {API_ENDPOINT} from '../constants/Constants.js'
+
 import 'isomorphic-fetch';
 
 function onLoadingComics() {
@@ -26,7 +28,7 @@ export function fetchComics() {
   return function(dispatch, getState) {
     dispatch(onLoadingComics()); // sets the loading state
 
-    return fetch('http://comic.allocsoc.net/comics')
+    return fetch(`${API_ENDPOINT}comics`)
       .then(function(response) {
 	return response.json();
       }).then(function(json) {

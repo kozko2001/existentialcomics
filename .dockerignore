@@ -1,2 +1,5 @@
 scrape/images
 android/
+web/
+.git/
+.ropeproject/

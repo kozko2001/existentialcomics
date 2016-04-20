@@ -8,6 +8,8 @@ import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import {subscribe, unsubscribe} from '../actions/PushActions'; 
+import {API_ENDPOINT} from '../constants/Constants.js';
 
 class ListStrips extends Component {
 
@@ -20,7 +22,7 @@ class ListStrips extends Component {
   }
 
   getImageUrl(strip) {
-    return `http://comic.allocsoc.net/comics/image/${strip._id}`
+    return `${API_ENDPOINT}comics/image/${strip._id}`
   }
 
   getCurrentStripIndex() {
@@ -50,28 +52,42 @@ class ListStrips extends Component {
     let strip = this.props.data[index]
     this.actions.onChangeStripSelected(strip);
   }
+
+  subscribeButton() {
+
+    let comic_id = this.props.params.comicId;
+    let comics_subscribed = this.props.topics;
+    let is = comics_subscribed.filter((t) => t === comic_id).length > 0
+    
+    let text = is ? 'Unsubscribe' : 'Subscribe';
+    let action = () => { is ? unsubscribe(comic_id) : subscribe(comic_id)} 
+
+    return (
+      <FlatButton onClick={action} label={text} />
+    )
+  }
+  
   
   render() {
+
+    console.log(this.props.topics);
+    
     let currentStripIndex = this.getCurrentStripIndex()
+    let goBackToStrips = () => location.href = '/';
+    let goToOriginalSite = () => window.open(strip ? strip.url : '', '_blank');
+    let strip = this.props.data[currentStripIndex];
+
+    var viewer = (<div> </div>)
 
     if(currentStripIndex >= 0) {
       let canGoLater = (currentStripIndex + 1) < this.props.data.length 
       let canGoNewer = currentStripIndex > 0 
-      let strip = this.props.data[currentStripIndex];
 
       let goNewer = () => this.actionGoNewer();
       let goLater = () => this.actionGoLater();
       let goRandom = () => this.actionGoRandom();
-      let goBackToStrips = () => location.href = '/';
-      let goToOriginalSite = () => window.open(strip.url, '_blank');
       
-      return (
-	<main>
-	  <AppBar
-	    title={strip.title}
-	    iconElementLeft={<IconButton onClick={goBackToStrips}><ArrowBack/></IconButton>}
-	    iconElementRight={<FlatButton label='Go to original site' onClick={goToOriginalSite} />}
-	    /> 
+      viewer = (
 	  <div className='strips'>
 	    <div className='toolbar'>
 	      <FlatButton disabled={!canGoNewer} primary={true} onClick={goNewer}>
@@ -88,13 +104,20 @@ class ListStrips extends Component {
 	      <img src={this.getImageUrl(strip)}/>
 	    </div>
 	  </div>
-	</main>
       )
-    } else {
-      return (<div>
-	      </div>);
     }
+
+    return (<main>
+	    <AppBar
+	    title={strip ? strip.title : ''}
+	    iconElementLeft={<IconButton onClick={goBackToStrips}><ArrowBack/></IconButton>}
+	    iconElementRight={this.subscribeButton()}
+	    /> 
+	    {viewer}
+	    </main>);
   }
 }
 
-export default connect((state) => state.listStripReducer)(ListStrips)
+export default connect((state) => {
+  return {...state.listStripReducer, topics: state.pushReducer.topics}
+})(ListStrips)
