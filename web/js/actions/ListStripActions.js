@@ -11,11 +11,12 @@ function onLoadingStrips(comic_id) {
 }
 
 
-function onStripsSucced(comic_id, strips) {
+function onStripsSucced(comic_id, strips, strip_id) {
   return {
     type: STRIP_SUCCEDED,
     data: strips,
-    comic_id
+    comic_id,
+    strip_id
   };
 }
 
@@ -33,7 +34,7 @@ export function onChangeStripSelected(strip) {
   }
 }
 
-export function fetchStrips(comic_id) {
+export function fetchStrips(comic_id, strip_id = undefined) {
   return function(dispatch, getState) {
     
     dispatch(onLoadingStrips(comic_id)); // sets the loading state
@@ -49,7 +50,7 @@ export function fetchStrips(comic_id) {
       }).then(function(json) {
 	let result = json['result'].concat(cache);
 	localStorage.setItem(comic_id, JSON.stringify(result));
-	dispatch(onStripsSucced(comic_id, result));
+	dispatch(onStripsSucced(comic_id, result, strip_id));
       }).catch(function(err) {
 	dispatch(onStripFailed(err));
       });

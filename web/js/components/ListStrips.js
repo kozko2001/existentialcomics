@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {Link, hashHistory} from 'react-router';
 import * as ListStripActions from '../actions/ListStripActions';
 import {bindActionCreators} from 'redux'
 import LazyLoad from 'react-lazyload';
@@ -15,10 +15,20 @@ class ListStrips extends Component {
 
   componentDidMount() {
     const {dispatch} = this.props;
-    const {comicId} = this.props.params;
+    const {comicId, stripId} = this.props.params;
 
     this.actions = bindActionCreators(ListStripActions, dispatch);
-    this.actions.fetchStrips(comicId);
+    this.actions.fetchStrips(comicId, stripId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps)
+    const {stripId, comicId} = nextProps.params;
+    const selected = nextProps.selected;
+
+    if(selected && stripId != selected._id) {
+      hashHistory.push(`/detail/${comicId}/${selected._id}`);
+    }
   }
 
   getImageUrl(strip) {
@@ -27,8 +37,10 @@ class ListStrips extends Component {
 
   getCurrentStripIndex() {
     let strips = this.props.data;
-    if(strips) {
-      return strips.findIndex((strip) => strip === this.props.selected);
+    let stripId = this.props.params.stripId;
+
+    if(strips && stripId) {
+      return strips.findIndex((strip) => strip._id === stripId);
     } else {
       return -1;
     }
@@ -69,11 +81,8 @@ class ListStrips extends Component {
   
   
   render() {
-
-    console.log(this.props.topics);
-    
-    let currentStripIndex = this.getCurrentStripIndex()
-    let goBackToStrips = () => location.href = '/';
+    let currentStripIndex = this.getCurrentStripIndex();
+    let goBackToStrips = () => hashHistory.push('/');
     let goToOriginalSite = () => window.open(strip ? strip.url : '', '_blank');
     let strip = this.props.data[currentStripIndex];
 
@@ -104,7 +113,7 @@ class ListStrips extends Component {
 	      <img src={this.getImageUrl(strip)}/>
 	    </div>
 	  </div>
-      )
+      );
     }
 
     return (<main>

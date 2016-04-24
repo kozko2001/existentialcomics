@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Link, browserHistory } from 'react-router';
+import {Link, hashHistory} from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
 import Card from 'material-ui/Card/Card';
 
@@ -29,7 +29,7 @@ export default class ComicCard extends Component {
   }
 
   onComicSelected() {
-    browserHistory.push(`/detail/${this.props.id}`);
+    hashHistory.push(`/detail/${this.props.id}`);
   }
 
   render() {
