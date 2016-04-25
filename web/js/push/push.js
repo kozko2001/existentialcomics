@@ -9,7 +9,6 @@ function addTopicsSubscribed(topic) {
     topics.push(topic);
 
     localStorage.setItem('topics', JSON.stringify(topics));
-    console.log('addTopics... ', topics)
   }
   return topics;
 }

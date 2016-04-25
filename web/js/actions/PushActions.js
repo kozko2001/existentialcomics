@@ -12,15 +12,19 @@ function onSubscribeChanged(topics) {
 }
 
 export function subscribe(topic) {
-  push.subscribe(topic).then(function(r){
-    let topics = push.getTopicsSubscribed();
-    dispatch(onSubscribeChanged(topics));
-  });
+  return function(dispatch, getState) {
+    push.subscribe(topic).then(function(r){
+      let topics = push.getTopicsSubscribed();
+      dispatch(onSubscribeChanged(topics));
+    });
+  }
 }
 
 export function unsubscribe(topic) {
-  push.unsubscribe(topic).then(function(r){
-    let topics = push.getTopicsSubscribed();
-    dispatch(onSubscribeChanged(topics));
-  });
+  return function(dispatch, getState) {
+    push.unsubscribe(topic).then(function(r){
+      let topics = push.getTopicsSubscribed();
+      dispatch(onSubscribeChanged(topics));
+    });
+  };
 }
