@@ -8,7 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import {subscribe, unsubscribe} from '../actions/PushActions'; 
+import * as PushActions from '../actions/PushActions'; 
 import {API_ENDPOINT} from '../constants/Constants.js';
 
 class ListStrips extends Component {
@@ -72,7 +72,9 @@ class ListStrips extends Component {
     let is = comics_subscribed.filter((t) => t === comic_id).length > 0
     
     let text = is ? 'Unsubscribe' : 'Subscribe';
-    let action = () => { is ? unsubscribe(comic_id) : subscribe(comic_id)} 
+    const {dispatch} = this.props;
+    let actions = bindActionCreators(PushActions, dispatch);
+    let action = () => { is ? actions.unsubscribe(comic_id) : actions.subscribe(comic_id)} 
 
     return (
       <FlatButton onClick={action} label={text} />
