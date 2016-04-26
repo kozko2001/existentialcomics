@@ -80,6 +80,35 @@ def get_image(document_id):
 def get_thumbnail(document_id):
     return _get_image(document_id, "thumbnail")
 
+@app.route('/comics/timeline', methods=['POST'])
+def get_timeline():
+    content = request.get_json()
+    print content
+
+    comics = content.get("comics", [])
+    last_id = content.get("last_id", None)
+
+    find_key = {}
+    projection = ['comic', 'title', 'text', 'url', 'order']
+
+    if comics:
+        find_key["comic"] = {"$in": comics}
+
+    collection = db.comics;
+    cursor = collection.find(find_key, projection).sort([("createdAt", -1)]).limit(100)
+
+    if last_id:
+        last_id = ObjectId(last_id)
+
+    cursor = takewhile(lambda x: x['_id'] != last_id, cursor)
+
+    data = json.loads(JSONEncoder().encode(list(cursor)))  # Ugly hack to remove objectid
+    result = {
+        'result': data
+    }
+    return jsonify(result)
+
+
 
 def _get_image(document_id, image_field):
     doc = comics.find_one({
