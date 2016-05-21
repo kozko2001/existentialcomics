@@ -32,8 +32,8 @@ Make the first screen be more atractive to new users
 - [ ] http://stackoverflow.com/questions/28224301/targeting-action-bar-menu-items-with-showcaseview
 
 *** TODO Release v 1.0
-- [ ] Make the screenshots
-- [ ] Do the last final tests
+- [X] Make the screenshots
+- [X] Do the last final tests
 - [ ] Make the release to the play store 
 
 ** Roadmap   
@@ -54,5 +54,6 @@ Make the first screen be more atractive to new users
 - [ ] Peanuts
 - [ ] Smbc
 - [ ] phdcomics
+- [ ] See 
 - More ?
     
