@@ -13,3 +13,6 @@ class PushPipeline(object):
             "data.comic": key,
         }
         r = requests.post("http://push:8081/event/%s" % key, data=data)
+
+        ## Hack to notify also using webpush custom implementation
+        r = request.post("http://localhost:5000/webpush/notify", json = {"topic": key})

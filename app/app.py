@@ -5,8 +5,13 @@ import json
 import gridfs
 import requests
 from itertools import takewhile
+from flask.ext.cors import CORS
+import os
+
 
 app = Flask(__name__)
+CORS(app)
+
 
 # mongo db connection
 connection = pymongo.MongoClient('mongo')
@@ -79,6 +84,35 @@ def get_image(document_id):
 def get_thumbnail(document_id):
     return _get_image(document_id, "thumbnail")
 
+@app.route('/comics/timeline', methods=['POST'])
+def get_timeline():
+    content = request.get_json()
+    print content
+
+    comics = content.get("comics", [])
+    last_id = content.get("last_id", None)
+
+    find_key = {}
+    projection = ['comic', 'title', 'text', 'url', 'order']
+
+    if comics:
+        find_key["comic"] = {"$in": comics}
+
+    collection = db.comics;
+    cursor = collection.find(find_key, projection).sort([("createdAt", -1)]).limit(100)
+
+    if last_id:
+        last_id = ObjectId(last_id)
+
+    cursor = takewhile(lambda x: x['_id'] != last_id, cursor)
+
+    data = json.loads(JSONEncoder().encode(list(cursor)))  # Ugly hack to remove objectid
+    result = {
+        'result': data
+    }
+    return jsonify(result)
+
+
 
 def _get_image(document_id, image_field):
     doc = comics.find_one({
@@ -135,6 +169,59 @@ def subscribe(user_id, topic):
 def unsubscribe(user_id, topic):
     r = requests.delete("http://push:8081/subscriber/%s/subscriptions/%s" % (user_id, topic))
     print r
+
+    return jsonify({"result": "ok"})
+
+
+@app.route("/webpush/register", methods=['POST'])
+def webpush_register():
+    content = request.get_json()
+
+    print request
+    print content
+
+    valid = "endpoint" in content and "topics" in content
+    if valid:
+        collection = db.webpush;
+
+        key = {"token": content["endpoint"]}
+        data = {"$set": {"topics": content["topics"], "type": "webpush-chrome"}}
+
+        collection.update_one(key, data, upsert=True)
+
+        return jsonify({"result": "ok"})
+    else:
+        return jsonify({"result": "ko"})
+
+
+@app.route("/webpush/notify", methods=['POST'])
+def webpush_notify():
+    content = request.get_json()
+
+    topic = content["topic"]
+    key = os.environ['GCM_KEY']
+
+    collection = db.webpush;
+    cursor = collection.find({"topics": topic, "type": "webpush-chrome"})
+    tokens = map(lambda i: i["token"].split("/")[-1], cursor)
+
+
+    headers = {
+        "Authorization": "key=" + key,
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "registration_ids": tokens
+    }
+
+    print headers
+    print data
+
+    r = requests.post("https://android.googleapis.com/gcm/send", json=data, headers=headers)
+    _json = r.text
+
+    print _json
 
     return jsonify({"result": "ok"})
 
