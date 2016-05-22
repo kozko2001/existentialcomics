@@ -2,6 +2,7 @@ package net.coscolla.comicstrip.push.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +11,10 @@ import android.support.v4.app.NotificationCompat;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 import net.coscolla.comicstrip.ui.list.ListStripsActivity;
 import net.coscolla.comicstrip.usecases.PushReceiveUseCase;
 
@@ -80,16 +81,18 @@ public class GcmMessageHandler extends GcmListenerService {
   }
 
   private PendingIntent createIntent(Comic comic, Strip strip) {
-    Intent intent = new Intent(this, ListStripsActivity.class);
-    intent.putExtra(ListStripsActivity.INTENT_ARG_COMIC, Parcels.wrap(comic));
-    intent.putExtra(ListStripsActivity.INTENT_ARG_FROM_NOTIFICATION, true);
-    intent.putExtra(ListStripsActivity.INTENT_ARG_FROM_NOTIFICATION_STRIP, Parcels.wrap(strip));
 
-    return PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        );
+    Intent resultIntent = new Intent(this, ListStripsActivity.class);
+    resultIntent.putExtra(ListStripsActivity.INTENT_ARG_COMIC, Parcels.wrap(comic));
+    resultIntent.putExtra(ListStripsActivity.INTENT_ARG_FROM_NOTIFICATION, true);
+    resultIntent.putExtra(ListStripsActivity.INTENT_ARG_FROM_NOTIFICATION_STRIP, Parcels.wrap(strip));
+
+    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+    // Adds the back stack
+    stackBuilder.addParentStack(ListStripsActivity.class);
+    // Adds the Intent to the top of the stack
+    stackBuilder.addNextIntent(resultIntent);
+
+    return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 }

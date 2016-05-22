@@ -32,7 +32,7 @@ import dagger.Component;
         DatabaseModule.class,
         HttpClientModule.class,
         FsCacheModule.class,
-        AnalyticsModule.class
+        MarketingModule.class
     }
 )
 public interface AppComponent {

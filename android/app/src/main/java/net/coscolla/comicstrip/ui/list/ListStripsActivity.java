@@ -33,10 +33,10 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Comic;
 import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 import net.coscolla.comicstrip.ui.AdapterCallback;
 import net.coscolla.comicstrip.ui.detail.DetailStripActivity;
 import net.coscolla.comicstrip.ui.list.adapter.StripAdapter;

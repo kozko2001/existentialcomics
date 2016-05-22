@@ -1,6 +1,6 @@
 package net.coscolla.comicstrip.ui.list;
 
-import net.coscolla.comicstrip.analytics.IAnalytics;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 import net.coscolla.comicstrip.push.PushManager;
 import net.coscolla.comicstrip.push.api.PushRegisterRequestData;
 import net.coscolla.comicstrip.push.api.PushRegisterResponse;

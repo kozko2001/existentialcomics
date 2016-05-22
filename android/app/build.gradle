@@ -18,7 +18,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.fernandocejas.frodo'
 apply plugin: 'com.tmiyamon.mdicons'
 apply plugin: 'me.tatarka.retrolambda'
-
+apply plugin: 'com.google.gms.google-services'
 
 
 android {
@@ -96,7 +96,7 @@ dependencies {
     compile 'com.github.ybq:Android-SpinKit:1.0.1'
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile "com.google.android.gms:play-services-gcm:8.4.0"
+    compile "com.google.android.gms:play-services-gcm:9.0.0"
 
     compile 'com.commit451:PhotoView:1.2.4'
 
@@ -135,7 +135,6 @@ dependencies {
     compile ('io.github.kobakei:ratethisapp:1.0.2') {
         exclude module: 'appcompat-v7'
     }
-
 
     // canary leak
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'

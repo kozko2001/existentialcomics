@@ -29,9 +29,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import net.coscolla.comicstrip.R;
-import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.di.Graph;
 import net.coscolla.comicstrip.entities.Strip;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 import net.coscolla.comicstrip.ui.detail.adapter.DetailStripPageAdapter;
 import net.coscolla.comicstrip.usecases.DetailStripUseCase;
 

@@ -27,8 +27,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.detail.DetailStripActivity" />
-        <activity android:name=".ui.list.ListStripsActivity" />
+        <activity android:name=".ui.list.ListStripsActivity"
+                  android:parentActivityName=".ui.comics.ComicsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.comics.ComicsActivity"/>
+        </activity>
+        <activity android:name=".ui.detail.DetailStripActivity"
+                  android:parentActivityName=".ui.list.ListStripsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.list.ListStripsActivity"/>
+        </activity>
 
         <!-- GCM -->
         <service android:name=".push.gcm.RegistrationIntentService" android:exported="false"/>
@@ -57,7 +67,7 @@
         </service>
         <!-- END GCM -->
 
-        <meta-data android:name="endpoint" android:value="http://comic.allocsoc.net/" />
+        <meta-data android:name="endpoint" android:value="https://comic.allocsoc.net/" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

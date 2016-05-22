@@ -16,8 +16,8 @@
 
 package net.coscolla.comicstrip.di;
 
-import net.coscolla.comicstrip.analytics.IAnalytics;
 import net.coscolla.comicstrip.db.ComicCache;
+import net.coscolla.comicstrip.marketing.analytics.IAnalytics;
 import net.coscolla.comicstrip.net.api.ComicApi;
 import net.coscolla.comicstrip.net.api.UrlBuilder;
 import net.coscolla.comicstrip.push.PushManager;
