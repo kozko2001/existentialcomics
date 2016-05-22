@@ -16,7 +16,7 @@ class CynadineSpider(BaseSpider):
         if not self.existsInDatabase(permalink):
             item = ExistentialcomicsItem()
 
-            date = response.xpath("//*[contains(@class, 'meta-data')]/div/h3/a/text()").extract_first()
+            date = response.xpath("//*[contains(@class, 'meta-data')]/h3/a/text()").extract_first()
             date = datetime.strptime(date, "%Y.%m.%d")
             if date.year < 2014:
                 return

@@ -13,7 +13,7 @@ class ExistentialSpider(BaseSpider):
 
     def parse(self, response):
         ## going to next page
-        last_page = response.xpath("//area[@alt='last']/@href").extract_first()
+        last_page = response.xpath("//a[contains(img/@src, 'nav_end')]/@href").extract_first()
 
         if last_page:
             url = "http://existentialcomics.com%s" % last_page
